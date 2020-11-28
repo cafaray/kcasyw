@@ -68,3 +68,25 @@ CREATE TABLE kmgm21t (
     foreign key(idselection)
     REFERENCES kmgm20t(id)
 );
+
+-- sorteo-participantes
+CREATE TABLE kmgm01t (
+    iddraw INT NOT NULL,
+    idparticipant INT NOT NULL,
+    primary key(iddraw, idparticipant),
+    foreign key(iddraw)
+    REFERENCES kmgm00t(id),
+    foreign key(idparticipant)
+    REFERENCES kmgm11t(id)
+);
+
+-- sorteo-premios
+CREATE TABLE kmgm02t (
+    iddraw INT NOT NULL,
+    idgift INT NOT NULL,
+    primary key(iddraw, idgift),
+    foreign key(iddraw)
+    REFERENCES kmgm00t(id),
+    foreign key(idgift)
+    REFERENCES kmgm12t(id)
+);
