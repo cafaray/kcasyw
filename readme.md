@@ -8,11 +8,11 @@ La aplicación consta de una página que permite llevar a cabo el registro de so
 
 Para acceder al administrador, es necesario contar con la cuenta (correo electrónico) del que se ha designado como administrador y la contraseña que se le ha entregado. 
 
-![Inicio de sesión]('_resources/sorteo_bio-Solución-Admin.png')
+![Inicio de sesión](_resources/sorteo_bio-Solucion-Admin.png)
 
 Solamente se tendrá un usuario administrador y su configuración es manual. Por tanto, en caso de pérdida de las credenciales de acceso, se tendrán que solicitar nuevamente al responsable de la aplicación.
 
-![Pantalla principal]('_resources/sorteo_bio-Solución-Main.png')
+![Pantalla principal](_resources/sorteo_bio-Solucion-Admin-Main.png)
 
 Una vez que se haya accedido, aparecerá el panel de administración con las siguientes opciones de menú.Cada una de las pantallas vinculadas a las opciones de menú son las que se describen en adelante.
 
@@ -28,7 +28,7 @@ Permite crear, modificar, eliminar y listar los sorteos. Se debe de indicar un n
 - Los detalles del sorteo se pueden consultar en cualquier momento
 - El nombre del sorteo no puede contener más de 100 caracteres
 
-![Pantalla sorteos]('_resources/sorteo_bio-Solución-Sorteos.png')
+![Pantalla sorteos](_resources/sorteo_bio-Solucion-Admin-Sorteos.png)
 
 El botón de “Agregar Participantes”, te lleva a la pantalla de registro de participantes y te permite seleccionar un registro de Sorteo para asociarlos a este. De esta forma se estarían asociando los participantes a un sorteo en particular. Lo mismo sucede con el botón de “Agregar Premios”, que te dirige a la pantalla de mantenimiento de premios asociados a un Sorteo. 
 
@@ -51,7 +51,7 @@ El registro de grupos se realiza con el fin de catalogar a los participantes en 
 - Los nombres deben de ser únicos, no se permiten duplicados.
 - Los grupos no están asociados a sorteos, se pueden usar en cualquier sorteo.
 
-![Pantalla sorteos]('_resources/sorteo_bio-Solución-Grupos.png')
+![Pantalla grupos](_resources/sorteo_bio-Solucion-Admin-Grupos.png)
 
 En la pantalla se muestra el listado de grupos con los ya existentes y permite llevar a cabo la modificación en todo momento y la eliminación siempre y cuando no se encuentren en uso. 
 
@@ -66,7 +66,7 @@ La identificación y medio de comunicación con los participantes para el reclam
 - Se puede seleccionar un grupo del listado previamente registrado. No es un campo obligatorio.
 - Se puede establecer el evento al que se le autoriza al participante. En caso de no ser especificado, se entiende que puede participar en cualquier evento.
 
-![Pantalla participantes]('_resources/sorteo_bio-Solución-participantes.png')
+![Pantalla participantes](_resources/sorteo_bio-Solucion-Admin-participantes.png)
 
 Es posible llevar a cabo la selección del grupo al que pertenece el participante durante el sorteo. En caso de no marcarse ningún grupo, se considera que podrá acceder a cualquier de los grupos registrados para el sorteo, pudiendo seleccionar alguno de todos los premios incluidos en el sorteo.
 
@@ -87,7 +87,7 @@ Los premios, al igual que los participantes, se pueden asociar a un sorteo en pa
 - La descripción debe contener el detalle del premio, puede incluir un máximo de dos mil caracteres. 
 - En el listado de premios, es posible llevar a cabo las actividades de modificación y eliminación, solo en caso de que el premio no haya sido seleccionado. 
  
-![Pantalla sorteos]('_resources/sorteo_bio-Solución-Premios.png')
+![Pantalla premios](_resources/sorteo_bio-Solucion-Admin-Premios.png)
 
 Los premios solo se pueden seleccionar una vez por parte de los participantes. Una vez concretada la operación de selección, se envía un correo de confirmación al administrador y el participante con el detalle del premio para su próxima reclamación.
 
