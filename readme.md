@@ -95,4 +95,28 @@ En la pantalla del participante aparecerá un listado de premios por escoger y q
 
 Los premios que no fueron seleccionados al cierre del evento, se marcarán como no disponibles. En caso de querer utilizar el registro para otro evento, será necesario editar el premio desde el listado de premios y asignar al sorteo en el que se requiere incluir. 
 
+## El sorteo.
 
+Una vez que el administrador haya publicado el sorteo, se mandará un correo electrónico a todos los participantes invitándolos a acceder, en el correo se enviará una clave de acceso única que les permitirá entrar al panel de selección de premios. 
+
+![Acceso sorteo](_resources/sorteo_bio-Solucion-Sorteo-Acceso.png)
+
+En caso de que algún participante no pueda acceder correctamente con la información enviada por correo electrónico, se podrá notificar al administrador del evento a través del enlace de “Problema con el acceso”. En este momento se enviará un correo electrónico al administrador notificando el problema.
+
+A los participantes que ya han seleccionado su premio, no se les permitirá acceder nuevamente. En caso de que traten de acceder al sorteo se les enviará un mensaje de error.
+
+![Acceso sorteo fallo](_resources/sorteo_bio-Solucion-Sorteo-Acceso-Fail.png)
+
+Una vez se encuentren en la pantalla de selección de premios. Se listaran los premios disponibles, el participante podrá llevar a cabo la selección de un premio y enviar la confirmación de selección. 
+
+![Lista premios](_resources/sorteo_bio-Solucion-Sorteo-seleccion.png)
+
+Sin embargo y con base a la dinámica, es posible que en el momento de la selección, alguien más haya seleccionado alguno y por tanto se notificará del error al momento del envío de la confirmación. El participante tendrá que actualizar el listado para ver los premios que aún se encuentran disponibles.
+
+![Seleccion repetida](_resources/sorteo_bio-Solucion-Sorteo-Seleccion-error.png)
+
+Al momento de confirmar la selección del premio, se enviará un correo electrónico al administrador del evento y al participante, notificando los detalles del premio. 
+
+![Seleccion resumen](_resources/sorteo_bio-Solucion-Sorteo-Resumen.png)
+
+Una vez que el participante elige Salir, se dirigirá a la pantalla principal del sitio de [biotecsa](http://biotecsa.com).
