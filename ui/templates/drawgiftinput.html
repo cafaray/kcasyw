@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block usuario %}{{ session['user'] }}{% endblock %}
+{% block content %}
+<h1>Selección de participantes para {{draw['title']}}</h1>
+
+<form action="/drawgiftinput/{{draw['id']}}" method="POST">
+    <div class="form-row align-items-center">        
+        <div class="form-group col-md-12">
+
+            <select class="custom-select" multiple name="gifts">
+                {% for gift in gifts %}
+                    <option value="{{ gift['id'] }}">{{gift['gift']}}, {{gift['description']}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="form-row align-items-center">        
+        <div class="form-group">
+            <button type="button" class="btn btn-danger" onclick="javascript:location.replace('/home')">Cancelar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

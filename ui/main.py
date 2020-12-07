@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, render_template, request, session, flash
+from flask import Flask, redirect, url_for, render_template, request, session, flash, jsonify
 import requests
 from datetime import timedelta
 
@@ -76,6 +76,83 @@ def draw_input_edit(iddraw):
             response = requests.get(BASE_URL + "draws/{}".format(iddraw))
             print(response)
             return render_template('drawinput.html', draw=response.json())
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/drawparticipants/<iddraw>', methods=['GET'])
+def draw_participants(iddraw: int):
+    if 'user' in session:
+        response = requests.get(BASE_URL + "draws/{}/participants/".format(iddraw))
+        draw = requests.get(BASE_URL + "draws/{}".format(iddraw))
+        print(response.json())
+        print(draw.json())
+        return render_template('drawparticipants.html', mydraw=draw.json(), drawparticipants=response.json())
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/drawparticipantinput/<iddraw>', methods=['GET', 'POST'])
+def draw_participants_input(iddraw: int):
+    if 'user' in session:
+        print("requested method", request.method)
+        if request.method=='POST':
+            multiselect = request.form.getlist('participants')
+            print("multiselct as is:",multiselect)
+            participants = []
+            for e in multiselect:
+                print('participant[id]:', e)
+                participant = {'id': e}
+                participants.append(participant)
+            draw_participants = {"participants": participants}
+            print("data to send: ", draw_participants)
+            response = requests.post(BASE_URL + "draws/{}/participants".format(iddraw), json=draw_participants)
+            print(response)
+            return redirect(url_for('home'))
+        else:
+            draw = getDraw(iddraw)
+            participants = requests.get(BASE_URL + "participants/")            
+            return render_template('drawparticipantinput.html', draw=draw.json(), participants=participants.json())
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/drawgifts/<iddraw>', methods=['GET'])
+def draw_gifts(iddraw: int):
+    if 'user' in session:
+        response = requests.get(BASE_URL + "draws/{}/gifts/".format(iddraw))
+        draw = requests.get(BASE_URL + "draws/{}".format(iddraw))
+        print(response.json())
+        print(draw.json())
+        return render_template('drawgifts.html', mydraw=draw.json(), drawgifts=response.json())
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/drawgiftinput/<iddraw>', methods=['GET', 'POST'])
+def draw_gift_input(iddraw: int):
+    if 'user' in session:
+        print("requested method", request.method)
+        if request.method=='POST':
+            multiselect = request.form.getlist('gifts')
+            print("multiselct as is:",multiselect)
+            gifts = []
+            for e in multiselect:
+                print('gift[id]:', e)
+                gift = {'id': e}
+                gifts.append(gift)
+            draw_gifts = {"gifts": gifts}
+            print("data to send: ", draw_gifts)
+            response = requests.post(BASE_URL + "draws/{}/gifts".format(iddraw), json=draw_gifts)
+            print(response)
+            return redirect(url_for('home'))
+        else:
+            draw = getDraw(iddraw)
+            gifts = requests.get(BASE_URL + "gifts/")            
+            return render_template('drawgiftinput.html', draw=draw.json(), gifts=gifts.json())
+    else:
+        return redirect(url_for('login'))
+
+def getDraw(iddraw:int):
+    draw = requests.get(BASE_URL + "draws/{}".format(iddraw))
+    print(draw.json())
+    return draw
 
 # ############################################### #
 # routes for manage groups:                       #

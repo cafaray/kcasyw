@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block usuario %}{{ session['user'] }}{% endblock %}
+{% block content %}
+<div class="form-check form-check-inline">
+    <h2>Registro de participantes de {{ mydraw['title'] }}</h2>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/drawparticipantinput/{{ mydraw['id'] }}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Cambiar registros</a>
+</div>
+
+{% if drawparticipants.participants %}
+<table class="table">
+    <thead class="thead-dark">
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Participante</th>
+        <th scope="col">Correo electrónico</th>
+        <th scope="col">Grupo</th>
+        <!-- <th scope="col">&nbsp;</th> -->
+    </tr>
+    </thead>
+    <tbody>        
+        {% for participant in drawparticipants.participants %}        
+        <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <th scope="row">{{ participant['participant'] }}</th>
+            <td>{{ participant['email'] }}</td>
+            <td>{{ participant['group']['groupname'] }}</td>                    
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>  
+{% else %}
+    <div class="alert alert-info" role="alert">
+        <p>No hay registros disponibles</p>
+    </div>
+{% endif %}
+<div class="form-row align-items-center">        
+    <div class="form-group">
+        <a type="button" class="btn btn-success" href="/home">Regresar</a>
+    </div>
+</div>
+{% endblock %}

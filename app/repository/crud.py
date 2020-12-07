@@ -129,9 +129,49 @@ def add_draw_participant(db: Session, draw_id: int, participant_id: int):
     db.refresh(db_dp)
     return db_dp
 
+def add_draw_participants(db: Session, draw_id: int, participants: schemas.ParticipantList):
+    count = 0
+    print('data in come:',participants)
+    for participant in participants.participants:
+        print('participant:',participant)
+        db_dp = models.DrawParticipants(iddraw = draw_id, idparticipant = participant.id)    
+        db.add(db_dp)
+        count = count + 1
+    db.commit()    
+    return count
+
+# SELECT kmgm00t.id iddraw, kmgm00t.title title, kmgm00t.fordate fordate, kmgm00t.status status, 
+#         kmgm11t.id idparticipant, kmgm11t.participant participant, kmgm11t.email email, 
+#         kmgm10t.id idgroup, kmgm10t.groupname groupname, kmgm10t.description description
+#   FROM kmgm01t INNER JOIN kmgm00t ON kmgm01t.iddraw = kmgm00t.id
+#     INNER JOIN kmgm11t ON kmgm01t.idparticipant = kmgm11t.id 
+#     INNER JOIN kmgm10t ON kmgm11t.idgroup = kmgm10t.id
+
 def get_draw_participants(db: Session, draw_id: int, skip: int = 0, limit: int = 100):
-    drawParticipants = db.query(models.DrawParticipants).join(models.Draw, models.Draw.id == models.DrawParticipants.iddraw).join(models.Participant, models.Participant.id == models.DrawParticipants.idparticipant).offset(skip).limit(limit).all()
-    return drawParticipants
+    print('get_draw_participants({})'.format(draw_id))
+    drawParticipants = db.query(models.DrawParticipants, models.Draw, models.Participant, models.Group)\
+        .filter(models.DrawParticipants.iddraw==draw_id)\
+            .join(models.Draw, models.Draw.id == models.DrawParticipants.iddraw)\
+            .join(models.Participant, models.Participant.id == models.DrawParticipants.idparticipant)\
+            .join(models.Group, models.Group.id == models.Participant.idgroup)\
+                .offset(skip).limit(limit).all()    
+    count = 0
+
+    drawReady = False
+    draw = None
+    participants = []
+    for row in drawParticipants:        
+        oDraw = row[1]
+        oParticipant = row[2]        
+        oGroup = row[3]
+        if not drawReady:
+            draw = { 'id': oDraw.id, 'title': oDraw.title, 'status':oDraw.status, 'fordate':oDraw.fordate }
+            drawReady = True
+        participant = { 'id': oParticipant.id, 'participant': oParticipant.participant, 'email': oParticipant.email, 'group': { 'id': oGroup.id, 'groupname': oGroup.groupname, 'description': oGroup.description } }
+        participants.append(participant)
+    result = {'draw': draw, 'participants': participants }
+    
+    return result
 
 def delete_draw_participant(db: Session, draw_id: int, participant_id: int):
     drawParticipant = db.query(models.DrawParticipants).filter(models.DrawParticipants.iddraw == draw_id, models.DrawParticipants.idparticipant == participant_id).first()
@@ -146,7 +186,45 @@ def add_draw_gift(db: Session, draw_id: int, gift_id: int):
     db.refresh(db_dg)
     return db_dg
 
+def add_draw_gifts(db: Session, draw_id: int, gifts: schemas.GiftList):
+    print('data in come:',gifts)
+    count = 0
+    for gift in gifts.gifts:
+        print('gift:',gift)
+        db_dg = models.DrawParticipants(iddraw = draw_id, idgift = gift.id)
+        db.add(db_dg)
+        count = count + 1
+    db.commit()    
+    return count
+
 def get_draw_gifts(db: Session, draw_id: int, skip: int = 0, limit: int = 100):
+    print('get_draw_gifts({})'.format(draw_id))
+    drawGifts = db.query(models.DrawGifts, models.Draw, models.Gifts, models.Group)\
+        .filter(models.DrawGifts.iddraw==draw_id)\
+            .join(models.Draw, models.Draw.id == models.DrawGifts.iddraw)\
+            .join(models.Gifts, models.Gifts.id == models.DrawGifts.idgift)\
+            .join(models.Group, models.Group.id == models.Gifts.idgroup)\
+                .offset(skip).limit(limit).all()    
+    count = 0
+
+    drawReady = False
+    draw = None
+    gifts = []
+    for row in drawGifts:        
+        oDraw = row[1]
+        oGift = row[2]        
+        oGroup = row[3]
+        if not drawReady:
+            draw = { 'id': oDraw.id, 'title': oDraw.title, 'status':oDraw.status, 'fordate':oDraw.fordate }
+            drawReady = True
+        gift = { 'id': oGift.id, 'gift': oGift.gift, 'quantity': oGift.quantity, 'image': oGift.image, 'description': oGift.description, 'group': { 'id': oGroup.id, 'groupname': oGroup.groupname, 'description': oGroup.description } }
+        gifts.append(gift)
+    result = {'draw': draw, 'gifts': gifts }
+    
+    return result
+
+
+
     drawGifts = db.query(models.DrawGifts).join(models.Draw, models.Draw.id == models.DrawGifts.iddraw).join(models.Gifts, models.Gifts.id == models.DrawGifts.idgift).offset(skip).limit(limit).all()
     return drawGifts
 
@@ -157,8 +235,8 @@ def delete_draw_gift(db: Session, draw_id: int, gift_id: int):
     return -1
 
 
-def add_draw_participant_gift(db: Session, draw_participant_gift: schemas.DrawParticipantGiftCreate):
-    db_dg = models.DrawParticipantGift(iddraw = draw_participant_gift.draw.id, idparticipant=draw_participant_gift.participant.id, idgift = draw_participant_gift.gift.id, dateselection=draw_participant_gift.dateselection)
+def add_draw_participant_gift(db: Session, draw_id: int, draw_participant_gift: schemas.DrawParticipantGiftCreate):
+    db_dg = models.DrawParticipantGift(iddraw = draw_id, idparticipant=draw_participant_gift.participant.id, idgift = draw_participant_gift.gift.id, dateselection=draw_participant_gift.dateselection)
     db.add(db_dg)
     db.commit()
     db.refresh(db_dg)
