@@ -120,3 +120,7 @@ Al momento de confirmar la selección del premio, se enviará un correo electró
 ![Seleccion resumen](_resources/sorteo_bio-Solucion-Sorteo-Resumen.png)
 
 Una vez que el participante elige Salir, se dirigirá a la pantalla principal del sitio de [biotecsa](http://biotecsa.com).
+
+
+
+`uvicorn main:app --reload`
