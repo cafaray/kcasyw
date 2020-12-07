@@ -271,6 +271,20 @@ def gift_input_edit(idgift):
             response = requests.get(BASE_URL + "gifts/{}".format(idgift))
             print(response)
             return render_template('giftinput.html', gift=response.json(), groups=getGroups())
+    else:
+        return redirect(url_for('/'))
+
+@app.route('/gifts/<idgift>/loadimages/', methods=['POST'])
+def gift_load_image(idgift: int):
+    if 'user' in session:        
+        file = request.files['file']
+        print(file.filename)        
+        files = {'file': (file.filename, file.read())}
+        response = requests.post(BASE_URL+'gifts/{}/uploadfile/'.format(idgift), files=files)
+        print(response)
+        return redirect(url_for("gifts"))
+    else:
+        return redirect(url_for('/'))
 
 def getGroups():
     group_response = requests.get(BASE_URL + 'groups/')

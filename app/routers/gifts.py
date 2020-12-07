@@ -1,4 +1,4 @@
-import os
+import os, shutil
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
 from fastapi.responses import FileResponse
 
@@ -58,10 +58,10 @@ def update_gift(giftid: int, gift: schemas.GiftCreate, db: Session = Depends(get
 @router.post("/{giftid}/uploadfile/")
 async def create_upload_file(giftid: int, file: UploadFile = File(...), db:Session = Depends(get_db)):
     print('file received:', file.filename)
-    fn = os.path.basename(file.filename)       
-    print('fn', fn)
+    fn = os.path.basename(file.filename)
    # open read and write the file into the server 
     open(fn, 'wb').write(file.file.read()) 
+    shutil.move(fn, '../ui/static/images/{}'.format(file.filename))
     # get gift
     gift = crud.update_gift_image(db=db, gift_id=giftid, image=file.filename)    
     print('gift updated', gift)

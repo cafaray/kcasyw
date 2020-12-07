@@ -219,21 +219,14 @@ def get_draw_gifts(db: Session, draw_id: int, skip: int = 0, limit: int = 100):
             drawReady = True
         gift = { 'id': oGift.id, 'gift': oGift.gift, 'quantity': oGift.quantity, 'image': oGift.image, 'description': oGift.description, 'group': { 'id': oGroup.id, 'groupname': oGroup.groupname, 'description': oGroup.description } }
         gifts.append(gift)
-    result = {'draw': draw, 'gifts': gifts }
-    
+    result = {'draw': draw, 'gifts': gifts }    
     return result
-
-
-
-    drawGifts = db.query(models.DrawGifts).join(models.Draw, models.Draw.id == models.DrawGifts.iddraw).join(models.Gifts, models.Gifts.id == models.DrawGifts.idgift).offset(skip).limit(limit).all()
-    return drawGifts
 
 def delete_draw_gift(db: Session, draw_id: int, gift_id: int):
     drawGift = db.query(models.DrawGifts).filter(models.DrawGifts.iddraw == draw_id, models.DrawGifts.idgift == gift_id).first()
     db.delete(drawGift)
     db.commit()
     return -1
-
 
 def add_draw_participant_gift(db: Session, draw_id: int, draw_participant_gift: schemas.DrawParticipantGiftCreate):
     db_dg = models.DrawParticipantGift(iddraw = draw_id, idparticipant=draw_participant_gift.participant.id, idgift = draw_participant_gift.gift.id, dateselection=draw_participant_gift.dateselection)

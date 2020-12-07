@@ -27,7 +27,10 @@
                 <td>{{ gift['gift'] }}</td>
                 <td>{{ gift['quantity'] }}</td>
                 <td>{{ gift['description'] }}</td>
-                <td>{{ gift['image'] }}</td>
+                <!-- <td>{{ gift['image'] }}</td>  
+                <td><img src="{{url_for('static', filename = 'images/gift["image"]')}}" height="120" width="120" alt="Not available image" />
+                -->
+                <td><img src="static/images/{{gift['image']}}" height="120" width="120" alt="Not available image" />
                 <td>
                     {% for group in groups %}
                         {% if group['id']== gift['group']['id'] %}
