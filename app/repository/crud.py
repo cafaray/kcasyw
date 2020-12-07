@@ -130,8 +130,10 @@ def add_draw_participant(db: Session, draw_id: int, participant_id: int):
     return db_dp
 
 def add_draw_participants(db: Session, draw_id: int, participants: schemas.ParticipantList):
+    print('add_draw_participants:', draw_id, participants)
+    r = db.query(models.DrawParticipants).filter(models.DrawParticipants.iddraw == draw_id).delete(synchronize_session=False)
+    print("delete drawparticipants result:", r)
     count = 0
-    print('data in come:',participants)
     for participant in participants.participants:
         print('participant:',participant)
         db_dp = models.DrawParticipants(iddraw = draw_id, idparticipant = participant.id)    
@@ -187,6 +189,8 @@ def add_draw_gift(db: Session, draw_id: int, gift_id: int):
 def add_draw_gifts(db: Session, draw_id: int, gifts: schemas.GiftList):
     print('data in come:',gifts)
     count = 0
+    r = db.query(models.DrawGifts).filter(models.DrawGifts.iddraw == draw_id).delete(synchronize_session=False)
+    print("delete drawgifts result:", r)
     for gift in gifts.gifts:
         print('gift:',gift)
         db_dg = models.DrawGifts(iddraw = draw_id, idgift = gift.id)
