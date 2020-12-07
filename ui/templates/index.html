@@ -14,6 +14,8 @@
             <th scope="col">Evento</th>
             <th scope="col">Fecha</th>
             <th scope="col">&nbsp;</th>
+            <th scope="col">&nbsp;</th>
+            <th scope="col">&nbsp;</th>
             <!-- <th scope="col">&nbsp;</th> -->
         </tr>
         </thead>
@@ -25,6 +27,8 @@
                 <td>{{ draw['fordate'] }}</td>
                 
             <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawinput/{}')".format(draw['id']) }}" >Editar</button></td>
+            <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawparticipants/{}')".format(draw['id']) }}" >Participantes</button></td>
+            <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawgifts/{}')".format(draw['id']) }}" >Regalos</button></td>
             <!-- <td><button type="button" class="btn btn-danger">Eliminar</button></td> -->
             </tr>
         {% endfor %}

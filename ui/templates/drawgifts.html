@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block usuario %}{{ session['user'] }}{% endblock %}
+{% block content %}
+<div class="form-check form-check-inline">
+    <h2>Registro de premios de {{ mydraw['title'] }}</h2>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="/drawgiftinput/{{ mydraw['id'] }}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Cambiar premios</a>
+</div>
+
+{% if drawgifts.gifts %}
+<table class="table">
+    <thead class="thead-dark">
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Premio</th>
+        <th scope="col">Cantidad</th>
+        <th scope="col">Descripción</th>
+        <th scope="col">Grupo</th>
+        <!-- <th scope="col">&nbsp;</th> -->
+    </tr>
+    </thead>
+    <tbody>        
+        {% for gift in drawgifts.gifts %}        
+        <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <th scope="row">{{ gift['gift'] }}</th>
+            <td>{{ gift['quantity'] }}</td>
+            <td>{{ gift['description'] }}</td>
+            <td>{{ gift['group']['groupname'] }}</td>                    
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>  
+{% else %}
+    <div class="alert alert-info" role="alert">
+        <p>No hay registros disponibles</p>
+    </div>
+{% endif %}
+<div class="form-row align-items-center">        
+    <div class="form-group">
+        <a type="button" class="btn btn-success" href="/home">Regresar</a>
+    </div>
+</div>
+{% endblock %}
