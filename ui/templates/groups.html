@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block usuario %}{{ session['user'] }}{% endblock %}
+{% block content %}    
+    <div class="form-check form-check-inline">
+        <h1>Listado de Grupos</h1>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="/groupinput" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Nuevo grupo</a>
+    </div>
+    
+
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Grupo</th>
+            <th scope="col">Descripci&oacute;n</th>
+            <th scope="col">&nbsp;</th>
+            <!-- <th scope="col">&nbsp;</th> -->
+        </tr>
+        </thead>
+        <tbody>
+        {% for group in groups %}
+            <tr>
+                <th scope="row">{{ group['id'] }}</th>
+                <td>{{ group['groupname'] }}</td>
+                <td>{{ group['description'] }}</td>
+                
+            <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/groupinput/{}')".format(group['id']) }}" >Editar</button></td>
+            <!-- <td><button type="button" class="btn btn-danger">Eliminar</button></td> -->
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>  
+
+{% endblock %}

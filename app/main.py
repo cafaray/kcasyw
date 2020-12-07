@@ -1,21 +1,30 @@
-from typing import Optional
-from fastapi import FastAPI
-from pydantic import BaseModel, Field
+from fastapi import Depends, FastAPI
+from fastapi.routing import APIRoute
 
-app = FastAPI()
+from dependencies import get_query_token, get_token_header
+from routers import draws, groups, participants, gifts
 
-class Draw(BaseModel):
-    title: str = Field(
-        None, title="Title for the event draw", max_length=100
-    )
-    dateat: str = Field(
-        None, title="Date for the event draw", max_length=10
-    )    
+app = FastAPI(dependencies=[Depends(get_query_token)])
 
-@app.post("/draws")
-async def create_draw(draw: Draw):
-    return draw
+app.include_router(draws.router, prefix="/draws", tags=["Draws"], responses={404: {"RESOURCE_NOT_FOUND": "Not found"}}) # , dependencies=[Depends(get_token_header)],)
+app.include_router(groups.router, prefix="/groups", tags=["Groups"], responses={404: {"RESOURCE_NOT_FOUND": "Not found"}})
+app.include_router(participants.router, prefix="/participants", tags=["Participants"], responses={404: {"RESOURCE_NOT_FOUND": "Not found"}})
+app.include_router(gifts.router, prefix="/gifts", tags=["Gifts"], responses={404: {"RESOURCE_NOT_FOUND": "Not found"}})
 
-@app.put("/draws/{draw-id}")
-async def update_draw(draw_id: int, draw: Draw):
-    return {"draw-id": draw_id, **draw.dict() }
+@app.get("/")
+async def root():
+    return {"message": "Wellcome to kcasyw!"}
+
+def use_route_names_as_operation_ids(app: FastAPI) -> None:
+    """
+    Simplify operation IDs so that generated API clients have simpler function
+    names.
+
+    Should be called only after all routes have been added.
+    """
+    for route in app.routes:
+        if isinstance(route, APIRoute):
+            route.operation_id = route.name  # in this case, 'read_items'
+
+
+use_route_names_as_operation_ids(app)

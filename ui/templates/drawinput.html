@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block usuario %}{{ session['user'] }}{% endblock %}
+{% block content %}
+
+{% if draw['id']==-1 %}
+    <form action="/drawinput" method="POST">
+{% else %}
+    <form action="/drawinput/{{draw['id']}}" method="POST">        
+        <input type="hidden" name="status" value="{{draw['status']}}" />
+{% endif %}
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            
+            <label for="title">Nombre del evento</label>
+            <input type="text" class="form-control" id="title" name="title" placeholder="Nombre del evento" value="{{draw['title']}}" >
+        </div>
+    </div>
+    <div class="form-row">        
+        <div class="form-group col-md-2">
+            <label for="fecha">Fecha del evento</label>
+            <input type="date" class="form-control" id="fecha" name="fordate" placeholder="Cuando ocurre el evento" aria-describedby="dateHelp" value="{{draw['fordate']}}" >
+            <small id="datelHelp" class="form-text text-muted">Se debe indicar la fecha posterior a hoy y en formato dd/mm/aaaa</small>
+        </div>
+    </div>
+    <div class="form-row align-items-center">        
+        <div class="form-group">
+            <button type="button" class="btn btn-danger" onclick="javascript:location.replace('/home')">Cancelar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
+        </div>
+    </div>
+</form>
+
+
+
+{% endblock %}
