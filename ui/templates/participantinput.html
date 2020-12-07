@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block usuario %}{{ session['user'] }}{% endblock %}
+{% block content %}
+
+{% if participant['id']==-1 %}
+    <form action="/participantinput" method="POST">
+{% else %}
+    <form action="/participantinput/{{participant['id']}}" method="POST">                
+{% endif %}
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            
+            <label for="title">Nombre del participante</label>
+            <input type="text" class="form-control" id="title" name="participant" placeholder="Nombre del participante" value="{{participant['participant']}}" >
+        </div>
+    </div>
+    <div class="form-row">        
+        <div class="form-group col-md-12">
+            <label for="email">Correo electr&oacute;nico</label>
+            <input type="text" class="form-control" id="email" name="email" placeholder="Correo del participante" value="{{participant['email']}}" >
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="group">Grupo del participante</label>
+        <select class="form-control" id="group" name="idgroup">
+            {% for group in groups %}
+                {% if group['id']==participant['group']['id'] %}
+                    <option value="{{ group['id'] }}" selected>{{ group['groupname'] }}</option>          
+                {% else %}
+                    <option value="{{ group['id'] }}">{{ group['groupname'] }}</option>          
+                {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-row align-items-center">        
+        <div class="form-group">
+            <button type="button" class="btn btn-danger" onclick="javascript:location.replace('/participants')">Cancelar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
+        </div>
+    </div>
+</form>
+
+
+
+{% endblock %}

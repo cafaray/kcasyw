@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block usuario %}{{ session['user'] }}{% endblock %}
+{% block content %}
+
+{% if group['id']==-1 %}
+    <form action="/groupinput" method="POST">
+{% else %}
+    <form action="/groupinput/{{group['id']}}" method="POST">                
+{% endif %}
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            
+            <label for="title">Nombre del grupo</label>
+            <input type="text" class="form-control" id="title" name="groupname" placeholder="Nombre del grupo" value="{{group['groupname']}}" >
+        </div>
+    </div>
+    <div class="form-row">        
+        <div class="form-group col-md-12">
+            <label for="description">Descripci&oacute;n breve</label>
+            <textarea class="form-control" aria-label="Descricion" id="description" name="description">{{ group['description'] }}</textarea>                        
+        </div>
+    </div>
+    <div class="form-row align-items-center">        
+        <div class="form-group">
+            <button type="button" class="btn btn-danger" onclick="javascript:location.replace('/groups')">Cancelar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
+        </div>
+    </div>
+</form>
+
+
+
+{% endblock %}
