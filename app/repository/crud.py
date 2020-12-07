@@ -155,8 +155,6 @@ def get_draw_participants(db: Session, draw_id: int, skip: int = 0, limit: int =
             .join(models.Participant, models.Participant.id == models.DrawParticipants.idparticipant)\
             .join(models.Group, models.Group.id == models.Participant.idgroup)\
                 .offset(skip).limit(limit).all()    
-    count = 0
-
     drawReady = False
     draw = None
     participants = []
@@ -191,7 +189,7 @@ def add_draw_gifts(db: Session, draw_id: int, gifts: schemas.GiftList):
     count = 0
     for gift in gifts.gifts:
         print('gift:',gift)
-        db_dg = models.DrawParticipants(iddraw = draw_id, idgift = gift.id)
+        db_dg = models.DrawGifts(iddraw = draw_id, idgift = gift.id)
         db.add(db_dg)
         count = count + 1
     db.commit()    
@@ -205,8 +203,6 @@ def get_draw_gifts(db: Session, draw_id: int, skip: int = 0, limit: int = 100):
             .join(models.Gifts, models.Gifts.id == models.DrawGifts.idgift)\
             .join(models.Group, models.Group.id == models.Gifts.idgroup)\
                 .offset(skip).limit(limit).all()    
-    count = 0
-
     drawReady = False
     draw = None
     gifts = []
