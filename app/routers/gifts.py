@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+import os
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
+from fastapi.responses import FileResponse
 
 from dependencies import get_token_header
 
@@ -34,21 +36,40 @@ def create_gift(gift: schemas.GiftCreate, db: Session = Depends(get_db)):
     #print(gift)
     return gift
 
-@router.get("/{gift-id}", response_model=schemas.Gift, status_code=200)
-def get_gift(gift_id: int, db: Session = Depends(get_db)):
-    gift = crud.get_gifts(db=db, gift_id=gift_id)
+@router.get("/{giftid}", response_model=schemas.Gift, status_code=200)
+def get_gift(giftid: int, db: Session = Depends(get_db)):
+    gift = crud.get_gift(db=db, gift_id=giftid)
     if gift==None:
-        error = {"code": "RESOURCE_NOT_FOUND", "message": "The gift resource doesn't exists. Verify id {}".format(gift_id) }
+        error = {"code": "RESOURCE_NOT_FOUND", "message": "The gift resource doesn't exists. Verify id {}".format(giftid) }
         json_compatible_error_data = jsonable_encoder(error)
         return JSONResponse(status_code=404, content=json_compatible_error_data)
     return gift
 
-@router.delete("/{gift-id}", status_code=204)
-def remove_gift(gift_id: int, db: Session = Depends(get_db)):
-    crud.delete_gift(db=db, gift_id=gift_id)
+@router.delete("/{giftid}", status_code=204)
+def remove_gift(giftid: int, db: Session = Depends(get_db)):
+    crud.delete_gift(db=db, gift_id=giftid)
     return Response(status_code=204)
 
-@router.put("/{gift-id}",  status_code=200)
-def update_gift(gift_id: int, gift: schemas.GiftCreate, db: Session = Depends(get_db)):
-    gift = crud.update_gift(db=db, gift_id=gift_id, gift=gift)
+@router.put("/{giftid}",  status_code=200)
+def update_gift(giftid: int, gift: schemas.GiftCreate, db: Session = Depends(get_db)):
+    gift = crud.update_gift_image(db=db, gift_id=giftid, gift=gift)
     return gift
+
+@router.post("/{giftid}/uploadfile/")
+async def create_upload_file(giftid: int, file: UploadFile = File(...), db:Session = Depends(get_db)):
+    print('file received:', file.filename)
+    fn = os.path.basename(file.filename)       
+    print('fn', fn)
+   # open read and write the file into the server 
+    open(fn, 'wb').write(file.file.read()) 
+    # get gift
+    gift = crud.update_gift_image(db=db, gift_id=giftid, image=file.filename)    
+    print('gift updated', gift)
+    return {"image": file.filename}
+
+@router.get("/{giftid}/uploadfile/")
+async def get_upload_file(giftid: int, db: Session = Depends(get_db)):
+    print('giftid received:', giftid)
+    gift = crud.get_gift(db=db, gift_id=giftid)
+    print('gift result:', gift.image)
+    return FileResponse(gift.image)

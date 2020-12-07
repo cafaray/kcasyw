@@ -33,23 +33,23 @@ def create_draw(draw: schemas.DrawCreate, db: Session = Depends(get_db)):
     draw = crud.create_draw(db=db, draw=draw)
     return draw
 
-@router.get("/{draw-id}", response_model=schemas.Draw, status_code=200)
-def get_draw(draw_id: int, db: Session = Depends(get_db)):
-    draw = crud.get_draw(db=db, draw_id=draw_id)
+@router.get("/{drawid}", response_model=schemas.Draw, status_code=200)
+def get_draw(drawid: int, db: Session = Depends(get_db)):
+    draw = crud.get_draw(db=db, draw_id=drawid)
     if draw==None:
-        error = {"code": "RESOURCE_NOT_FOUND", "message": "The draw resource doesn't exists. Verify id {}".format(draw_id) }
+        error = {"code": "RESOURCE_NOT_FOUND", "message": "The draw resource doesn't exists. Verify id {}".format(drawid) }
         json_compatible_error_data = jsonable_encoder(error)
         return JSONResponse(status_code=404, content=json_compatible_error_data)
     return draw
 
-@router.delete("/{draw-id}", status_code=204)
-def remove_draw(draw_id: int, db: Session = Depends(get_db)):
-    crud.delete_draw(db=db, draw_id=draw_id)
+@router.delete("/{drawid}", status_code=204)
+def remove_draw(drawid: int, db: Session = Depends(get_db)):
+    crud.delete_draw(db=db, draw_id=drawid)
     return Response(status_code=204)
 
-@router.put("/{draw-id}",  status_code=200)
-def update_draw(draw_id: int, draw: schemas.DrawCreate, db: Session = Depends(get_db)):
-    draw = crud.update_draw(db=db, draw_id=draw_id, draw=draw)
+@router.put("/{drawid}",  status_code=200)
+def update_draw(drawid: int, draw: schemas.DrawCreate, db: Session = Depends(get_db)):
+    draw = crud.update_draw(db=db, draw_id=drawid, draw=draw)
     return draw
 
 @router.post("/{draw-id}/participants", status_code=201)

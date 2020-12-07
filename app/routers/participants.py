@@ -33,21 +33,21 @@ def create_participant(participant: schemas.ParticipantCreate, db: Session = Dep
     participant = crud.create_participant(db=db, participant=participant)
     return participant
 
-@router.get("/{participant-id}", response_model=schemas.Participant, status_code=200)
-def get_participant(participant_id: int, db: Session = Depends(get_db)):
-    participant = crud.get_participant(db=db, participant_id=participant_id)
+@router.get("/{participantid}", response_model=schemas.Participant, status_code=200)
+def get_participant(participantid: int, db: Session = Depends(get_db)):
+    participant = crud.get_participant(db=db, participant_id=participantid)
     if participant==None:
-        error = {"code": "RESOURCE_NOT_FOUND", "message": "The participant resource doesn't exists. Verify id {}".format(participant_id) }
+        error = {"code": "RESOURCE_NOT_FOUND", "message": "The participant resource doesn't exists. Verify id {}".format(participantid) }
         json_compatible_error_data = jsonable_encoder(error)
         return JSONResponse(status_code=404, content=json_compatible_error_data)
     return participant
 
-@router.delete("/{participant-id}", status_code=204)
-def remove_participant(participant_id: int, db: Session = Depends(get_db)):
-    crud.delete_participant(db=db, participant_id=participant_id)
+@router.delete("/{participantid}", status_code=204)
+def remove_participant(participantid: int, db: Session = Depends(get_db)):
+    crud.delete_participant(db=db, participant_id=participantid)
     return Response(status_code=204)
 
-@router.put("/{participant-id}",  status_code=200)
-def update_participant(participant_id: int, participant: schemas.ParticipantCreate, db: Session = Depends(get_db)):
-    participant = crud.update_participant(db=db, participant_id=participant_id, participant=participant)
+@router.put("/{participantid}",  status_code=200)
+def update_participant(participantid: int, participant: schemas.ParticipantCreate, db: Session = Depends(get_db)):
+    participant = crud.update_participant(db=db, participant_id=participantid, participant=participant)
     return participant

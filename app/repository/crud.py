@@ -98,12 +98,22 @@ def create_gift(db: Session, gift: schemas.GiftCreate):
     db.refresh(db_gift)
     return db_gift
 
-def update_participant(db: Session, gift_id: int, gift: schemas.GiftCreate):
+def update_gift(db: Session, gift_id: int, gift: schemas.GiftCreate):
     r = db.query(models.Gifts).filter(models.Gifts.id == gift_id).update({ "gift": gift.gift, "quantity": gift.quantity, "description": gift.description,"image":gift.image, "idgroup": gift.group.id })
     if r == None:
         return None
     db.commit()
     new_gift = get_gift(db, gift_id)
+    return new_gift
+
+def update_gift_image(db: Session, gift_id: int, image: str):
+    r = db.query(models.Gifts).filter(models.Gifts.id == gift_id).update({ "image": image })
+    print('the update operation results on: ', r)
+    if r == None:
+        return None
+    db.commit()    
+    new_gift = get_gift(db, gift_id)
+    print(new_gift)
     return new_gift
 
 def delete_gift(db: Session, gift_id: int):

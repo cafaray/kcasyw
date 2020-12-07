@@ -71,6 +71,14 @@ class GiftCreate(GiftBase):
 
 class Gift(GiftBase):
     id: int
+    gift: str
+    quantity: int
+    description: str
+    image: str
+    group: Group
+    class Config:
+        orm_mode=True
+
 
 class DrawParticipantsBase(BaseModel):
     iddraw: DrawLink
