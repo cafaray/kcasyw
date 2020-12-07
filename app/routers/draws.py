@@ -52,34 +52,45 @@ def update_draw(drawid: int, draw: schemas.DrawCreate, db: Session = Depends(get
     draw = crud.update_draw(db=db, draw_id=drawid, draw=draw)
     return draw
 
-@router.post("/{draw-id}/participants", status_code=201)
-def post_draw_participants(draw_id: int, participant_id, db: Session = Depends(get_db)):
-    draw_participant = crud.add_draw_participant(db=db, draw_id=draw_id, participant_id=participant_id)
+# draw-participants operations:
+#@router.post("/{drawid}/participants", status_code=201)
+#def post_draw_participant(drawid: int, participants: schemas.ParticipantList, db: Session = Depends(get_db)):
+#    draw_participant = crud.add_draw_participant(db=db, draw_id=drawid, participant_id=participant.id)
+#    return draw_participant
+
+@router.post("/{drawid}/participants", status_code=201)
+def post_draw_participants(drawid: int, participants: schemas.ParticipantList, db: Session = Depends(get_db)):
+    draw_participant = crud.add_draw_participants(db=db, draw_id=drawid, participants=participants)
     return draw_participant
 
-@router.get("/{draw-id}/participants", response_model=schemas.DrawParticipants, status_code=200)
-def get_draw_participants(draw_id: int, db: Session = Depends(get_db)):
-    draw_participants = crud.get_draw_participants(db=db, draw_id=draw_id)
-    return draw_participants
+@router.get("/{drawid}/participants", response_model=schemas.DrawParticipants, status_code=200)
+def get_draw_participants(drawid: int, db: Session = Depends(get_db)):
+    drawParticipants = crud.get_draw_participants(db=db, draw_id=drawid)
+    return drawParticipants
 
-@router.post("/{draw-id}/gifts", status_code=201)
-def post_draw_gift(draw_id: int, gift_id: int, db: Session = Depends(get_db)):
-    draw_gift = crud.add_draw_gift(db=db, draw_id=draw_id, gift_id=gift_id)
+@router.post("/{drawid}/gifts", status_code=201)
+def post_draw_gifts(drawid: int, gifts: schemas.GiftList, db: Session = Depends(get_db)):
+    draw_gift = crud.add_draw_gifts(db=db, draw_id=drawid, gifts=gifts)
     return draw_gift
 
-@router.get("/{draw-id}/gifts", response_model=schemas.DrawGifts, status_code=200)
-def get_draw_gifts(draw_id: int, db: Session = Depends(get_db)):
-    draw_gifts = crud.get_draw_gifts(db=db, draw_id=draw_id)
+#@router.post("/{drawid}/bulk-gifts", status_code=201)
+#def post_draw_gifts(drawid: int, gifts: schemas.GiftList, db: Session = Depends(get_db)):
+#    draw_gift = crud.add_draw_gifts(db=db, draw_id=drawid, gifts=gifts)
+#    return draw_gift
+
+@router.get("/{drawid}/gifts", response_model=schemas.DrawGifts, status_code=200)
+def get_draw_gifts(drawid: int, db: Session = Depends(get_db)):
+    draw_gifts = crud.get_draw_gifts(db=db, draw_id=drawid)
     return draw_gifts
 
-@router.get("/{draw-id}/selections", response_model=schemas.DrawParticipantGift, status_code=200)
-def get_draw_participants_gifts(draw_id: int, db: Session = Depends(get_db)):
-    draw_gifts = crud.get_draw_participants_gifts(db=db, draw_id=draw_id)
+@router.get("/{drawid}/selections", response_model=schemas.DrawParticipantGift, status_code=200)
+def get_draw_participants_gifts(drawid: int, db: Session = Depends(get_db)):
+    draw_gifts = crud.get_draw_participants_gifts(db=db, draw_id=drawid)
     return draw_gifts
 
-@router.post("/{draw-id}/selections", status_code=201)
-def post_draw_participant_gift(draw_participant_gift: schemas.DrawParticipantGiftCreate, db: Session = Depends(get_db)):
-    draw_participant_gift = crud.add_draw_participant_gift(db=db, draw_participant_gift=draw_participant_gift)
+@router.post("/{drawid}/selections", status_code=201)
+def post_draw_participant_gift(drawid: int, draw_participant_gift: schemas.DrawParticipantGiftCreate, db: Session = Depends(get_db)):    
+    draw_participant_gift = crud.add_draw_participant_gift(db=db, draw_id=drawid, draw_participant_gift=draw_participant_gift)
     return draw_participant_gift
 
 #@router.delete("/{draw-id}/participants/{participant-id}", status_code=204)

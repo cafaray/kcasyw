@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import List
+from pydantic import BaseModel, Field
+from typing import List, Optional
 from datetime import date
 
 class DrawBase(BaseModel):
@@ -56,6 +56,11 @@ class Participant(ParticipantBase):
     class Config:
         orm_mode = True
 
+class ParticipantList(BaseModel):
+    participants: List[ParticipantLink]
+    class Config:
+        orm_mode = True
+
 class GiftBase(BaseModel):
     gift: str
     quantity: int
@@ -69,6 +74,10 @@ class GiftLink(BaseModel):
 class GiftCreate(GiftBase):
     pass
 
+class GiftList(BaseModel):
+    gifts: List[GiftLink]
+
+
 class Gift(GiftBase):
     id: int
     gift: str
@@ -80,27 +89,33 @@ class Gift(GiftBase):
         orm_mode=True
 
 
-class DrawParticipantsBase(BaseModel):
-    iddraw: DrawLink
+class DrawParticipants(BaseModel):
+    draw: Optional[Draw]
+    participants: Optional[List[Participant]]
+    class Config:
+        orm_mode=True
+
+class DrawParticipantsCreate(BaseModel):
+    iddraw: Optional[DrawLink]= Field(
+        None, title="The draw identificator is informed for the operation inside the path param."
+    )
     idparticipant: ParticipantLink
 
-class DrawParticipantsCreate(DrawParticipantsBase):
-    pass
+#class DrawGiftsBase(BaseModel):
+#    iddraw: DrawLink
+#    idgift: GiftLink
 
-class DrawParticipants(BaseModel):
-    draw: Draw = -1
-    participants: List[Participant] = []
-
-class DrawGiftsBase(BaseModel):
-    iddraw: DrawLink
-    idgift: GiftLink
-
-class DrawGiftCreate(DrawGiftsBase):
-    pass
+class DrawGiftCreate(BaseModel):
+    iddraw: Optional[DrawLink]= Field(
+        None, title="The draw identificator is informed for the operation inside the path param."
+    )
+    gifts: GiftLink
 
 class DrawGifts(BaseModel):
-    draw: Draw = -1
-    gifts: List[Gift] = []
+    draw: Optional[Draw]
+    gifts: Optional[List[Gift]]
+    class Config:
+        orm_mode=True
 
 class DrawParticipantGift(BaseModel):
     id: int
@@ -111,7 +126,9 @@ class DrawParticipantGift(BaseModel):
     dtmail: date
 
 class DrawParticipantGiftCreate(BaseModel):
-    draw: DrawLink
+    draw: Optional[DrawLink] = Field(
+        None, title="The draw identificator is informed for the operation inside the path param."
+    )
     participant: ParticipantLink
     gift: GiftLink
     dateselection: date
