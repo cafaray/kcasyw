@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block usuario %}{{ session['user'] }}{% endblock %}
 {% block content %}
-<h1>Selección de participantes para {{draw['title']}}</h1>
+<h1>Selección de premios para {{draw['title']}}</h1>
 
 <form action="/drawgiftinput/{{draw['id']}}" method="POST">
     <div class="form-row align-items-center">        
