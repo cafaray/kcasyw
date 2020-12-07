@@ -249,7 +249,7 @@ def gift_input():
     if 'user' in session:
         print("requested method", request.method)
         if request.method=='POST':
-            gift = {"gift": request.form['gift'], "quantity": request.form['quantity'], "description": request.form['description'], "image":request.form['image'],  "group": { "id": request.form['idgroup'] } }
+            gift = {"gift": request.form['gift'], "quantity": request.form['quantity'], "description": request.form['description'], "image":'',  "group": { "id": request.form['idgroup'] } }
             print('gift to send: ', gift)
             response = requests.post(BASE_URL + "gifts/", json=gift)
             return redirect(url_for("gifts"))
