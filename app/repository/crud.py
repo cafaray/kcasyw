@@ -300,17 +300,32 @@ def set_draw_publish_end(db: Session, draw_id: int, enddate: str):
 
 def get_access(db:Session, participant: str, access_code: str):
     # print('Start search with params {}:{}'.format(participant, access_code))
-    access = db.query(models.DrawParticipants, models.Participant, models.Draw)\
-        .filter(models.Participant.email == participant and models.DrawPublish.access_code == access_code)\
-            .join(models.Participant, models.Participant.id == models.DrawParticipants.idparticipant)\
-            .join(models.DrawPublish, models.DrawPublish.iddraw == models.DrawParticipants.iddraw)\
-            .join(models.Draw, models.Draw.id == models.DrawParticipants.iddraw).first()
-    # print('access',access)
+    sql = """SELECT kmgm01t.iddraw AS kmgm01t_iddraw, 
+                    kmgm01t.idparticipant AS kmgm01t_idparticipant, 
+                    kmgm11t.id AS kmgm11t_id, 
+                    kmgm11t.participant AS kmgm11t_participant, 
+                    kmgm11t.email AS kmgm11t_email, 
+                    kmgm11t.idgroup AS kmgm11t_idgroup, 
+                    kmgm00t.id AS kmgm00t_id, 
+                    kmgm00t.title AS kmgm00t_title, 
+                    kmgm00t.fordate AS kmgm00t_fordate, 
+                    kmgm00t.status AS kmgm00t_status, 
+                    kmgm99t.iddraw AS kmgm99t_iddraw, 
+                    kmgm99t.startdate AS kmgm99t_startdate, 
+                    kmgm99t.enddate AS kmgm99t_enddate, 
+                    kmgm99t.access_code AS kmgm99t_access_code, 
+                    kmgm99t.tmstmp AS kmgm99t_tmstmp
+                FROM kmgm01t INNER JOIN kmgm11t 
+                  ON kmgm11t.id = kmgm01t.idparticipant INNER JOIN kmgm99t 
+                  ON kmgm99t.iddraw = kmgm01t.iddraw INNER JOIN kmgm00t 
+                  ON kmgm00t.id = kmgm01t.iddraw
+                WHERE kmgm11t.email = '{}' and kmgm99t.access_code='{}'""".format(participant, access_code)
+    access = db.execute(sql).first() 
+    print('access',access)
     if access:
-        oParticipant = access[1]
-        oDraw = access[2]
-        draw = { 'id': oDraw.id, 'title': oDraw.title, 'status':oDraw.status, 'fordate':oDraw.fordate }
-        participant = { 'id': oParticipant.id, 'participant': oParticipant.participant, 'email': oParticipant.email, 'group' : {'id': oParticipant.id, 'groupname': '', 'description': '' } }
+        #  (1, 1, 1, 'Alberto Farias', 'carlos.farias@gft.com', 2, 1, 'Cierre de año 2020', datetime.date(2020, 12, 17), 'onlive', 1, datetime.date(2020, 12, 8), None, '12345', datetime.datetime(2020, 12, 8, 9, 36, 59))
+        draw = { 'id': access[0], 'title': access[7], 'status':access[9], 'fordate':access[8] }
+        participant = { 'id': access[2], 'participant': access[3], 'email': access[4], 'group' : {'id': access[5], 'groupname': '', 'description': '' } }
         print('Previous result', draw, participant)
         participants = [participant]
         result = {'draw': draw, 'participants':participants}
@@ -346,6 +361,18 @@ def get_gift_byalias(db: Session, alias: str):
         return None
 
 def add_draw_participant_gift(db: Session, drawid: int, participantid: int, alias: str):
+    # first at all. be sure the participant doesn't pick one yet:
+    sql = "SELECT count(idparticipant) FROM kmgm20t WHERE iddraw='{}' and idparticipant = '{}';".format(drawid, participantid)
+    result = db.execute(sql)
+    count=1
+    if result:
+        for row in result:
+            print("record found: ", row[0])
+            count = row[0]
+    else:
+        return None
+    if count>0:
+        return count
     giftid = get_gift_byalias(alias=alias, db=db)
     if giftid:
         db_dg = models.DrawParticipantGift(iddraw = drawid, idparticipant=participantid, idgift = giftid, dsgift=alias)

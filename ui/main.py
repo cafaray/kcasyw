@@ -320,5 +320,88 @@ def getGroups():
     return group_response.json()
 
 
+# ############################################### #
+# routes for events:                              #
+# ############################################### #
+
+@app.route('/events/selection/<alias>')
+def events_selection(alias: str):
+    if 'participant' in session and 'draw' in session:
+        print('Selected gift', alias)
+        response = requests.post(BASE_URL+'events/{}/selections?alias={}&participantid={}'.format(session['draw'], alias, session['participantid']))
+        if response.status_code==201:
+            resgift = requests.get(BASE_URL+'events/{}/selections/participants/{}'.format(session['draw'], session['participantid']))
+            if resgift.status_code==200:
+                data = resgift.json()
+                flash("Feliciades has seleccionado tu premio, mira los detalles e imprime esta pantalla como comprobante!", "success")
+                return render_template('/event/selection.html', data= data)
+        else:
+            flash("Vaya al parecer no se ha logrado registrar el premio, selecciona otro!", "warning")                
+            return redirect(url_for('events_home'))
+    else:
+        # need to login
+        return redirect(url_for('events_login'))
+
+@app.route('/events/home')
+def events_home():
+    if 'participant' in session and 'draw' in session:
+        # here is the participant, look for available gifts:
+        res = requests.get(BASE_URL+'events/{}/selections?participantid={}'.format(session['draw'], session['participantid']))
+        print('response', res)
+        if res.status_code==200:            
+            data = res.json()
+            print (data)            
+            gifts = data['gifts']
+            if len(gifts)<=0:
+                flash("Vaya al parecer no se han localizado premios disponibles!", "warning")                
+                return render_template('/event/index.html')
+            else:
+                flash("Selecciona un premio antes de que alguien más lo tome!", "success")                
+                return render_template('/event/index.html', gifts=gifts)
+
+        else:
+            flash("Vaya hubo un fallo al recuperar los premios!", "warning")
+            return render_template('event/index.html')
+    else:
+        # need to login
+        return redirect(url_for('events_login'))
+
+@app.route('/events/', methods=['GET', 'POST'])
+def events_login():
+    if request.method=='POST':
+        # do login
+        participant = request.form['email']
+        access_code = request.form['password']
+        req = { 'participant': participant, 'access_code': access_code }
+        print('req', req)
+        response = requests.get(BASE_URL+'events/login?participant={}&access_code={}'.format(participant, access_code))
+        if response.status_code==200:
+            session.permanent = True
+            res = response.json()
+            print('res', res)
+            session['participant'] = res['participants'][0]['participant']
+            session['participantid'] = res['participants'][0]['id']
+            session['email'] = res['participants'][0]['email']
+            session['draw'] = res['draw']['id']            
+            session['data'] = res
+            print('values at session,\n\tparticipantid= {}\n\tparticipant={}\n\temail = {}\n\tdraw={}'.format(session['participantid'], session['participant'],session['email'],session['draw']))
+            return redirect(url_for('events_home'))
+        else:
+            flash("Usuario o contraseña incorrecto!", "danger")
+            return render_template('event/login.html')
+    else:
+        if 'participant' in session and 'draw' in session:
+            return redirect(url_for('events_home'))
+        
+    return render_template('event/login.html')
+
+@app.route('/events/logout')
+def events_logout():
+    session.pop('participant', None)
+    session.pop('draw', None)
+    session.pop('data', None)
+    flash("Has salido de la sesión!", "info")
+    return redirect(url_for('events_login'))
+
 if __name__=="__main__":
     app.run(debug=True)

@@ -30,7 +30,7 @@ def get_db():
 # ###################################################################### #
 
 # get access to a draw:
-@router.post("/login", response_model=schemas.DrawParticipants)
+@router.get("/login", response_model=schemas.DrawParticipants)
 def get_access_draw(participant: str, access_code: str, db: Session = Depends(get_db)):
     print('find a participant in a draw using {}:{}'.format(participant, access_code))
     if '@' in participant: # maybe is a email, so I let it in

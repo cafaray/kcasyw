@@ -1,5 +1,5 @@
-{% extends "base.html" %}
-{% block usuario %}{{ session['user'] }}{% endblock %}
+{% extends "event/base.html" %}
+{% block usuario %}{{ session['participant'] }}{% endblock %}
 {% block content %}    
 {% with messages = get_flashed_messages(with_categories=True) %}
 {% if messages %}
@@ -18,14 +18,12 @@
         <thead class="thead-dark">
         <tr>
             <th scope="col">#</th>
-            <th scope="col">Premio</th>
         </tr>
         </thead>
         <tbody>
-        {% for draw in draws %}
+        {% for gift in gifts %}
             <tr>
-                <th scope="row">{{ draw['id'] }}</th>
-                <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawpublish/{}')".format(draw['id']) }}" >Publicar</button></td>
+                <th scope="row"><a href="/events/selection/{{gift['alias']}}"><img src="/static/images/gift_box.jpeg" height="120" width="120" /><br /><span>#{{ gift['alias'] }}</span></a></th>
             </tr>
         {% endfor %}
         </tbody>
