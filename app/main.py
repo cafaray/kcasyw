@@ -4,7 +4,8 @@ from fastapi.routing import APIRoute
 from dependencies import get_query_token, get_token_header
 from routers import draws, groups, participants, gifts, events
 
-app = FastAPI(dependencies=[Depends(get_query_token)])
+# dependencies=[Depends(get_query_token)]
+app = FastAPI()
 
 app.include_router(draws.router, prefix="/draws", tags=["Draws"], responses={404: {"RESOURCE_NOT_FOUND": "Not found"}}) # , dependencies=[Depends(get_token_header)],)
 app.include_router(groups.router, prefix="/groups", tags=["Groups"], responses={404: {"RESOURCE_NOT_FOUND": "Not found"}})

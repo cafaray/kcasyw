@@ -2,11 +2,14 @@ from flask import Flask, redirect, url_for, render_template, request, session, f
 import requests
 from datetime import datetime, timedelta
 
-app = Flask("__main__")
+app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = "c29ydGUuYmlvdGVjc2EuY29tL2FkbWluCg=="
 app.permanent_session_lifetime= timedelta(hours=1)
+app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 
-BASE_URL = "http://127.0.0.1:8000/"
+BASE_URL = "http://biotecsa.com/draw/services/"
+
+
 
 def validateUser(email: str, password: str):
     return email=='sysadmin@biotecsa.com' and password == 'elPaso01+'        
@@ -30,7 +33,7 @@ def login():
     else:
         if 'user' in session:
             return redirect(url_for('home'))
-        return render_template('login.html')
+        return render_template('/login.html')
 
 @app.route('/logout')
 def logout():
@@ -404,4 +407,4 @@ def events_logout():
     return redirect(url_for('events_login'))
 
 if __name__=="__main__":
-    app.run(debug=True)
+    app.run( host='0.0.0.0')  # debug=True,
