@@ -81,7 +81,7 @@ class GiftList(BaseModel):
 class Gift(GiftBase):
     id: int
     gift: str
-    quantity: int
+    quantity: Optional[int]
     description: str
     image: str
     group: Group
@@ -143,6 +143,19 @@ class DrawPublishCreate(DrawPublishBase):
 
 class DrawPublish(DrawPublishBase):
     draw: Draw
+    startDate: date    
+    endDate: Optional[date]
+    access_code: str
+    class Config:
+        orm_mode=True
 
 class DrawEndPublish(BaseModel):
     enddate: date
+
+class DrawGiftAvailable(BaseModel):
+    iddraw: int
+    idgroup: int
+    alias: str
+
+class DrawGiftsAvailable(BaseModel):
+    gifts: List[DrawGiftAvailable]

@@ -7,7 +7,7 @@
     <div class="form-row align-items-center">        
         <div class="form-group col-md-12">
 
-            <select class="custom-select" multiple name="participants">
+            <select class="custom-select" multiple name="participants" size="30">
                 {% for participant in participants %}
                     <option value="{{ participant['id'] }}">{{participant['participant']}}, {{participant['email']}}</option>
                 {% endfor %}

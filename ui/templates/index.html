@@ -37,13 +37,16 @@
                 <td>{{ draw['title'] }}</td>
                 <td>{{ draw['fordate'] }}</td>
                 <td>{{ draw['status'] }}</td>
-            <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawinput/{}')".format(draw['id']) }}" >Editar</button></td>
-            <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawparticipants/{}')".format(draw['id']) }}" >Participantes</button></td>
-            <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawgifts/{}')".format(draw['id']) }}" >Regalos</button></td>
             {% if draw['status']=='pending' %}
+                <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawinput/{}')".format(draw['id']) }}" >Editar</button></td>
+                <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawparticipants/{}')".format(draw['id']) }}" >Participantes</button></td>
+                <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawgifts/{}')".format(draw['id']) }}" >Regalos</button></td>
                 <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawpublish/{}')".format(draw['id']) }}" >Publicar</button></td>
             {% else %}
-                <td><button type="button" class="btn btn-warning" disabled onclick="" >Publicar</button></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawruning/{}')".format(draw['id']) }}" >Ver acceso</button></td>
             {% endif %}
             <!-- <td><button type="button" class="btn btn-danger">Eliminar</button></td> -->
             </tr>

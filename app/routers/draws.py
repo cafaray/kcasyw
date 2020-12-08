@@ -73,25 +73,10 @@ def post_draw_gifts(drawid: int, gifts: schemas.GiftList, db: Session = Depends(
     draw_gift = crud.add_draw_gifts(db=db, draw_id=drawid, gifts=gifts)
     return draw_gift
 
-#@router.post("/{drawid}/bulk-gifts", status_code=201)
-#def post_draw_gifts(drawid: int, gifts: schemas.GiftList, db: Session = Depends(get_db)):
-#    draw_gift = crud.add_draw_gifts(db=db, draw_id=drawid, gifts=gifts)
-#    return draw_gift
-
 @router.get("/{drawid}/gifts", response_model=schemas.DrawGifts, status_code=200)
 def get_draw_gifts(drawid: int, db: Session = Depends(get_db)):
     draw_gifts = crud.get_draw_gifts(db=db, draw_id=drawid)
     return draw_gifts
-
-@router.get("/{drawid}/selections", response_model=schemas.DrawParticipantGift, status_code=200)
-def get_draw_participants_gifts(drawid: int, db: Session = Depends(get_db)):
-    draw_gifts = crud.get_draw_participants_gifts(db=db, draw_id=drawid)
-    return draw_gifts
-
-@router.post("/{drawid}/selections", status_code=201)
-def post_draw_participant_gift(drawid: int, draw_participant_gift: schemas.DrawParticipantGiftCreate, db: Session = Depends(get_db)):    
-    draw_participant_gift = crud.add_draw_participant_gift(db=db, draw_id=drawid, draw_participant_gift=draw_participant_gift)
-    return draw_participant_gift
 
 @router.post("/{drawid}/publish", status_code=201)
 def post_draw_publish(drawid: int, publish: schemas.DrawPublishCreate, db: Session = Depends(get_db)):
@@ -101,6 +86,15 @@ def post_draw_publish(drawid: int, publish: schemas.DrawPublishCreate, db: Sessi
 @router.post("/{drawid}/unpublish", status_code=201)
 def post_draw_unpublish(drawid: int, enddate: str, db: Session = Depends(get_db)):
     draw_publish = crud.set_draw_publish_end(db=db, draw_id=drawid, enddate=enddate)
+    return draw_publish
+
+@router.get('/{drawid}/publish', response_model=schemas.DrawPublish, status_code=200)
+def get_draw_publish(drawid: int, db: Session = Depends(get_db)):
+    draw_publish = crud.get_draw_publish(db=db, draw_id=drawid)
+    if draw_publish == None:
+        error = {"code": "RESOURCE_NOT_FOUND", "message": "The draw event resource doesn't exists. Verify id {}".format(drawid) }
+        json_compatible_error_data = jsonable_encoder(error)
+        return JSONResponse(status_code=404, content=json_compatible_error_data)
     return draw_publish
 
 #@router.delete("/{draw-id}/participants/{participant-id}", status_code=204)

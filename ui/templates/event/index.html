@@ -1,0 +1,32 @@
+{% extends "event/base.html" %}
+{% block usuario %}{{ session['participant'] }}{% endblock %}
+{% block content %}    
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+    {% for category, msg in messages %}
+      <div class="alert alert-{{category}}" role="alert">
+        <p>{{msg}}</p>
+      </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+    <div class="form-check form-check-inline">
+        <h1>Premios disponibles</h1>        
+    </div>
+    
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for gift in gifts %}
+            <tr>
+                <th scope="row"><a href="/events/selection/{{gift['alias']}}"><img src="/static/images/gift_box.jpeg" height="120" width="120" /><br /><span>#{{ gift['alias'] }}</span></a></th>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>  
+
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block usuario %}{{ session['user'] }}{% endblock %}
+{% block content %}
+<div class="form-check form-check-inline">
+    <h2>Evento en publicación {{ draw.draw['title'] }}</h2>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button type="button" class="btn btn-warning" onclick="javascript:location.replace('/home')">Regresar</button>
+</div>
+<h2>Código de acceso:</h2>
+<div class="alert alert-info" role="alert">
+    <p>{{ draw.access_code }}</p>
+</div>
+{% endblock %}
