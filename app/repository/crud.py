@@ -59,6 +59,10 @@ def delete_group(db: Session, group_id: int):
 def get_participant(db: Session, participant_id: int):
     return db.query(models.Participant).join(models.Group, models.Group.id == models.Participant.idgroup).filter(models.Participant.id == participant_id).first()
 
+
+def get_participant_byemail(db: Session, participant: str):
+    return db.query(models.Participant).join(models.Group, models.Group.id == models.Participant.idgroup).filter(models.Participant.email == participant).first()
+
 def get_participants(db: Session, skip: int = 0, limit: int = 100):
     participants = db.query(models.Participant).join(models.Group, models.Group.id == models.Participant.idgroup).offset(skip).limit(limit).all()
     return participants
@@ -228,19 +232,37 @@ def delete_draw_gift(db: Session, draw_id: int, gift_id: int):
     db.commit()
     return -1
 
-def add_draw_participant_gift(db: Session, draw_id: int, draw_participant_gift: schemas.DrawParticipantGiftCreate):
-    db_dg = models.DrawParticipantGift(iddraw = draw_id, idparticipant=draw_participant_gift.participant.id, idgift = draw_participant_gift.gift.id, dateselection=draw_participant_gift.dateselection)
-    db.add(db_dg)
-    db.commit()
-    db.refresh(db_dg)
-    return db_dg
-
 def get_draw_participants_gifts(db: Session, draw_id: int, skip: int = 0, limit: int = 100):
-    drawGifts = db.query(models.DrawParticipantGift).join(
-        models.Draw, models.Draw.id == models.DrawParticipantGift.iddraw).join(
-            models.Participant, models.Participant.id == models.DrawParticipantGift.idparticipant).join(            
-                models.Gifts, models.Gifts.id == models.DrawParticipantGift.idgift).offset(skip).limit(limit).all()
-    return drawGifts
+    drawGifts = db.query(models.DrawParticipantGift, models.Gifts)\
+        .join(models.Draw, models.Draw.id == models.DrawParticipantGift.iddraw)\
+            .join(models.Gifts, models.Gifts.id == models.DrawParticipantGift.idgift).all()
+    if drawGifts:
+        elements = []
+        for drawGift in drawGifts:
+            oSelected = drawGift[0]
+            oGift = drawGift[1]
+            element = { 'idparticipant': oSelected.idparticipant, 'idgift': oGift.id, 'alias': oSelected.dsgift, 'evidence': oSelected.dateselection, 'gift': oGift.gift, 'description': oGift.description, 'image': oGift.image }            
+            print('the selected gift is: ', element)
+            elements.append(element)
+
+        return { 'data': elements }
+    else:
+        return None
+
+
+def get_draw_participant_gift(db: Session, draw_id: int, participant_id: int):
+    drawGift = db.query(models.DrawParticipantGift, models.Gifts).filter(models.DrawParticipantGift.idparticipant==participant_id)\
+        .join(models.Draw, models.Draw.id == models.DrawParticipantGift.iddraw)\
+            .join(models.Gifts, models.Gifts.id == models.DrawParticipantGift.idgift).first()
+    if drawGift:
+        oSelected = drawGift[0]
+        oGift = drawGift[1]
+        result = {  'idparticipant': participant_id, 'idgift': oGift.id, 'alias': oSelected.dsgift, 'evidence': oSelected.dateselection, 'gift': oGift.gift, 'description': oGift.description, 'image': oGift.image }
+        print('the selected gift is: ', result)
+        return result
+    else:
+        return None
+    
 
 def set_draw_publish(db: Session, draw_id: int, draw_publish: schemas.DrawPublishCreate):
     publish = models.DrawPublish(iddraw=draw_id, startdate=draw_publish.startDate, access_code=draw_publish.access_code)
@@ -254,11 +276,17 @@ def set_draw_publish(db: Session, draw_id: int, draw_publish: schemas.DrawPublis
 def get_draw_publish(db: Session, draw_id: int):
     publish = db.query(models.DrawPublish, models.Draw)\
         .filter(models.DrawPublish.iddraw==draw_id)\
-        .join(models.Draw, models.Draw.id == models.DrawPublish.iddraw).first()
-    db.add(publish)
-    db.commit()
-    db.refresh(publish)
-    return publish
+            .join(models.Draw, models.Draw.id == models.DrawPublish.iddraw).first()
+    if publish:
+        oPublish = publish[0]
+        oDraw = publish[1]
+        print(oDraw, oPublish)
+        draw = { 'id': oDraw.id, 'title': oDraw.title, 'status':oDraw.status, 'fordate':oDraw.fordate }
+        result = { 'draw': draw, 'startDate': oPublish.startdate, 'endDate': oPublish.enddate, 'access_code': oPublish.access_code }
+        print('result', result)
+        return result
+    else:
+        return None
 
 def set_draw_publish_end(db: Session, draw_id: int, enddate: str):
     r = db.query(models.DrawPublish).filter(models.DrawPublish.iddraw == draw_id).update({ "enddate": enddate })
@@ -269,3 +297,61 @@ def set_draw_publish_end(db: Session, draw_id: int, enddate: str):
         return None
     db.commit()    
     return r
+
+def get_access(db:Session, participant: str, access_code: str):
+    # print('Start search with params {}:{}'.format(participant, access_code))
+    access = db.query(models.DrawParticipants, models.Participant, models.Draw)\
+        .filter(models.Participant.email == participant and models.DrawPublish.access_code == access_code)\
+            .join(models.Participant, models.Participant.id == models.DrawParticipants.idparticipant)\
+            .join(models.DrawPublish, models.DrawPublish.iddraw == models.DrawParticipants.iddraw)\
+            .join(models.Draw, models.Draw.id == models.DrawParticipants.iddraw).first()
+    # print('access',access)
+    if access:
+        oParticipant = access[1]
+        oDraw = access[2]
+        draw = { 'id': oDraw.id, 'title': oDraw.title, 'status':oDraw.status, 'fordate':oDraw.fordate }
+        participant = { 'id': oParticipant.id, 'participant': oParticipant.participant, 'email': oParticipant.email, 'group' : {'id': oParticipant.id, 'groupname': '', 'description': '' } }
+        print('Previous result', draw, participant)
+        participants = [participant]
+        result = {'draw': draw, 'participants':participants}
+        return result
+    else:
+        return None
+
+def get_available_gifts(db:Session, iddraw: int, idgroup: int):
+    sql = """SELECT dg.iddraw AS iddraw, dg.idgift AS idgift, RIGHT(md5(CONCAT(g.id, g.gift)), 7) alias, g.idgroup As idgroup 
+        FROM kmgm02t dg INNER JOIN kmgm12t g 
+          ON dg.idgift = g.id 
+        WHERE dg.idgift NOT IN 
+           (SELECT idgift FROM kmgm20t WHERE iddraw = dg.iddraw)
+           AND g.idgroup = {} AND dg.iddraw = {};
+          """.format(idgroup, iddraw)
+    result = db.execute(sql)
+    gifts = []
+    for row in result:
+        gift = { 'iddraw': row[0], 'alias': row[2], 'idgroup': row[3] }
+        gifts.append(gift)
+    print('results from query:',gifts)
+    results = { 'gifts': gifts }
+    return results
+
+def get_gift_byalias(db: Session, alias: str):
+    sql = "SELECT id FROM kmgm12t WHERE RIGHT(md5(CONCAT(id, gift)), 7) = '{}';".format(alias)
+    result = db.execute(sql)
+    if result:
+        for row in result:
+            print("alias found: ", row[0])
+        return row[0]
+    else:
+        return None
+
+def add_draw_participant_gift(db: Session, drawid: int, participantid: int, alias: str):
+    giftid = get_gift_byalias(alias=alias, db=db)
+    if giftid:
+        db_dg = models.DrawParticipantGift(iddraw = drawid, idparticipant=participantid, idgift = giftid, dsgift=alias)
+        print('record to add:', db_dg)
+        db.add(db_dg)
+        db.commit()
+        return db_dg
+    else:
+        return None

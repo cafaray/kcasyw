@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date, DateTime, Enum, PrimaryKeyConstraint, Table, ForeignKeyConstraint
+from sqlalchemy import MetaData, Boolean, Column, ForeignKey, Integer, String, Date, DateTime, Enum, PrimaryKeyConstraint, Table, ForeignKeyConstraint
 from sqlalchemy.orm import relationship
 
 from .database import Base
@@ -51,7 +51,7 @@ class Gifts(Base):
     __tablename__ = "kmgm12t"
     id = Column(Integer, primary_key=True, index=True)
     gift = Column(String)
-    quantity = Column(String, unique=True, index=True)
+    quantity = Column(Integer, default=1)
     description = Column(String)
     image = Column(String)
     idgroup = Column(Integer, ForeignKey("kmgm10t.id"))
@@ -67,7 +67,8 @@ class DrawParticipantGift(Base):
     iddraw = Column(Integer, ForeignKey('kmgm00t.id'), primary_key=True)
     idparticipant = Column(Integer, ForeignKey('kmgm11t.id'), primary_key=True)
     idgift = Column(Integer, ForeignKey('kmgm12t.id'), primary_key=True)
-    dateselection = Column(Date())
+    dsgift = Column(String, unique=True, index=True)
+    dateselection = Column(DateTime, default=datetime.datetime.utcnow)
     datemail = Column(Date())
 
 class DrawPublish(Base):

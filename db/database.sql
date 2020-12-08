@@ -71,8 +71,9 @@ CREATE TABLE kmgm20t (
     iddraw INT NOT NULL,
     idparticipant INT NOT NULL,
     idgift INT NOT NULL,    
-    dateselection DATE NOT NULL,
-    datemail DATE NULL,
+    dsgift VARCHAR(7) NOT NULL,
+    dateselection TIMESTAMP NOT NULL,
+    datemail TIMESTAMP NULL,
     primary key(id, iddraw, idparticipant, idgift),
     foreign key(iddraw)
         REFERENCES kmgm00t(id),
@@ -126,3 +127,24 @@ CREATE TABLE kmgm99t (
     foreign key(iddraw)
         REFERENCES kmgm00t(id)
 );
+
+-- available gifts
+DROP VIEW IF EXISTS kmgv12t;
+CREATE VIEW kmgv12t AS 
+SELECT dg.iddraw AS iddraw, dg.idgift AS idgift, RIGHT(md5(CONCAT(g.id, g.gift)), 7) alias, g.idgroup As idgroup
+  FROM kmgm02t dg INNER JOIN kmgm12t g ON dg.idgift = g.id
+ WHERE dg.idgift NOT IN (SELECT idgift FROM kmgm20t WHERE iddraw = dg.iddraw);
+
+-- ******************************************************* --
+-- Some useful queries                                     --
+-- ******************************************************* --
+
+-- for access an event:
+SELECT kmgm01t.iddraw AS kmgm01t_iddraw, kmgm01t.idparticipant AS kmgm01t_idparticipant, kmgm11t.id AS kmgm11t_id, 
+        kmgm11t.participant AS kmgm11t_participant, kmgm11t.email AS kmgm11t_email, kmgm11t.idgroup AS kmgm11t_idgroup, 
+        kmgm00t.id AS kmgm00t_id, kmgm00t.title AS kmgm00t_title, kmgm00t.fordate AS kmgm00t_fordate, kmgm00t.status AS kmgm00t_status
+  FROM kmgm01t INNER JOIN kmgm11t 
+    ON kmgm11t.id = kmgm01t.idparticipant INNER JOIN kmgm99t 
+    ON kmgm99t.iddraw = kmgm01t.iddraw INNER JOIN kmgm00t 
+    ON kmgm00t.id = kmgm01t.iddraw
+WHERE kmgm11t.email = %(email_1)s

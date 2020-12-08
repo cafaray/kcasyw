@@ -7,7 +7,7 @@
     <div class="form-row align-items-center">        
         <div class="form-group col-md-12">
 
-            <select class="custom-select" multiple name="gifts">
+            <select class="custom-select" multiple name="gifts" size="30">
                 {% for gift in gifts %}
                     <option value="{{ gift['id'] }}">{{gift['gift']}}, {{gift['description']}}</option>
                 {% endfor %}

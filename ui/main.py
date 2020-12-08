@@ -151,15 +151,32 @@ def draw_gift_input(iddraw: int):
 
 @app.route('/drawpublish/<iddraw>')
 def set_draw_publish(iddraw: int):
-    draw = getDraw(iddraw).json()
-    if draw['status']=='pending' and draw['fordate']<=datetime.today().strftime('%Y-%m-%d'):
-        access_code = 'bio{}-{}'.format(iddraw, datetime.today().strftime('%M%s'))
-        publish = { "startDate": datetime.today().strftime('%Y-%m-%d'), "access_code": access_code }
-        response = requests.post(BASE_URL+'draws/{}/publish'.format(iddraw), json=publish)
-        return redirect(url_for('home'))
+    if 'user' in session:
+        draw = getDraw(iddraw).json()
+        if draw['status']=='pending' and draw['fordate']<=datetime.today().strftime('%Y-%m-%d'):
+            access_code = 'bio{}-{}'.format(iddraw, datetime.today().strftime('%M%s'))
+            publish = { "startDate": datetime.today().strftime('%Y-%m-%d'), "access_code": access_code }
+            response = requests.post(BASE_URL+'draws/{}/publish'.format(iddraw), json=publish)
+            flash("Se ha publicado el evento, el código de acceso que debes enviar para acceder es: {}".format(access_code), "info")
+            return redirect(url_for('home'))
+        else:
+            flash("No es posible publicar el evento, o bien el estatus no es el adecuado o la fecha aún no es adecuada.", "danger")
+            return redirect(url_for('home'))
     else:
-        flash("No es posible publicar el evento, o bien el estatus no es el adecuado o la fecha aún no es adecuada.", "danger")
-        return redirect(url_for('home'))
+        return redirect(url_for('login'))
+
+@app.route('/drawruning/<iddraw>')
+def get_access_code(iddraw: int):
+    if 'user' in session:
+        response = requests.get(BASE_URL+"draws/{}/publish".format(iddraw))
+        if response.status_code==200:
+            print(response.json())
+            return render_template('drawruning.html', draw=response.json())
+        else:
+            flash("No es posible localizar el evento, probablemente aún no este publicado", "warning")
+            return redirect(url_for('home'))
+    else:
+        return redirect(url_for('login'))
 
 def getDraw(iddraw:int):
     draw = requests.get(BASE_URL + "draws/{}".format(iddraw))
@@ -266,7 +283,7 @@ def gift_input():
             response = requests.post(BASE_URL + "gifts/", json=gift)
             return redirect(url_for("gifts"))
         else:
-            gift = {"id":-1, "gift": "", "quantity": "", "description": "", "image":"",  "group": { "id": -1 } }
+            gift = {"id":-1, "gift": "", "quantity": "1", "description": "", "image":"",  "group": { "id": -1 } }
             return render_template('giftinput.html', gift=gift, groups=getGroups())
 
 @app.route('/giftinput/<idgift>', methods=['POST', 'GET'])
