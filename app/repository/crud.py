@@ -241,3 +241,31 @@ def get_draw_participants_gifts(db: Session, draw_id: int, skip: int = 0, limit:
             models.Participant, models.Participant.id == models.DrawParticipantGift.idparticipant).join(            
                 models.Gifts, models.Gifts.id == models.DrawParticipantGift.idgift).offset(skip).limit(limit).all()
     return drawGifts
+
+def set_draw_publish(db: Session, draw_id: int, draw_publish: schemas.DrawPublishCreate):
+    publish = models.DrawPublish(iddraw=draw_id, startdate=draw_publish.startDate, access_code=draw_publish.access_code)
+    db.add(publish)
+    r = db.query(models.Draw).filter(models.Draw.id == draw_id).update({ "status": 'onlive' })
+    print('the update status draw on: ', r)
+    db.commit()
+    db.refresh(publish)
+    return publish
+
+def get_draw_publish(db: Session, draw_id: int):
+    publish = db.query(models.DrawPublish, models.Draw)\
+        .filter(models.DrawPublish.iddraw==draw_id)\
+        .join(models.Draw, models.Draw.id == models.DrawPublish.iddraw).first()
+    db.add(publish)
+    db.commit()
+    db.refresh(publish)
+    return publish
+
+def set_draw_publish_end(db: Session, draw_id: int, enddate: str):
+    r = db.query(models.DrawPublish).filter(models.DrawPublish.iddraw == draw_id).update({ "enddate": enddate })
+    print('the update operation draw publish on: ', r)
+    r = db.query(models.Draw).filter(models.Draw.id == draw_id).update({ "status": 'closed' })
+    print('the update status draw on: ', r)
+    if r == None:
+        return None
+    db.commit()    
+    return r

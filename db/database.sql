@@ -114,3 +114,15 @@ CREATE TABLE kmgm02t (
     foreign key(idgift)
         REFERENCES kmgm12t(id)
 );
+
+DROP TABLE IF EXISTS kmgm99t;
+CREATE TABLE kmgm99t (
+    iddraw INT NOT NULL,
+    startdate DATE NOT NULL,
+    enddate DATE NULL,
+    access_code VARCHAR(30) NOT NULL,
+    tmstmp TIMESTAMP NOT NULL,
+    primary key(iddraw),
+    foreign key(iddraw)
+        REFERENCES kmgm00t(id)
+);

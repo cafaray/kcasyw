@@ -93,6 +93,16 @@ def post_draw_participant_gift(drawid: int, draw_participant_gift: schemas.DrawP
     draw_participant_gift = crud.add_draw_participant_gift(db=db, draw_id=drawid, draw_participant_gift=draw_participant_gift)
     return draw_participant_gift
 
+@router.post("/{drawid}/publish", status_code=201)
+def post_draw_publish(drawid: int, publish: schemas.DrawPublishCreate, db: Session = Depends(get_db)):
+    draw_publish = crud.set_draw_publish(db=db, draw_id=drawid,draw_publish=publish)
+    return draw_publish
+
+@router.post("/{drawid}/unpublish", status_code=201)
+def post_draw_unpublish(drawid: int, enddate: str, db: Session = Depends(get_db)):
+    draw_publish = crud.set_draw_publish_end(db=db, draw_id=drawid, enddate=enddate)
+    return draw_publish
+
 #@router.delete("/{draw-id}/participants/{participant-id}", status_code=204)
 #def delete_draw_participants(draw_id: int, participant_id: int, db: Session = Depends(get_db)):
 #    crud.delete_draw_participant(db=db, draw_id=draw_id, participant_id=participant_id)

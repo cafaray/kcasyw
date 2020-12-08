@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 {% block usuario %}{{ session['user'] }}{% endblock %}
 {% block content %}    
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+    {% for category, msg in messages %}
+      <div class="alert alert-{{category}}" role="alert">
+        <p>{{msg}}</p>
+      </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
     <div class="form-check form-check-inline">
         <h1>Listado de Sorteos</h1>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <a href="/drawinput" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Nuevo sorteo</a>
@@ -13,6 +22,8 @@
             <th scope="col">#</th>
             <th scope="col">Evento</th>
             <th scope="col">Fecha</th>
+            <th scope="col">Estatus</th>
+            <th scope="col">&nbsp;</th>
             <th scope="col">&nbsp;</th>
             <th scope="col">&nbsp;</th>
             <th scope="col">&nbsp;</th>
@@ -25,10 +36,15 @@
                 <th scope="row">{{ draw['id'] }}</th>
                 <td>{{ draw['title'] }}</td>
                 <td>{{ draw['fordate'] }}</td>
-                
+                <td>{{ draw['status'] }}</td>
             <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawinput/{}')".format(draw['id']) }}" >Editar</button></td>
             <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawparticipants/{}')".format(draw['id']) }}" >Participantes</button></td>
             <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawgifts/{}')".format(draw['id']) }}" >Regalos</button></td>
+            {% if draw['status']=='pending' %}
+                <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawpublish/{}')".format(draw['id']) }}" >Publicar</button></td>
+            {% else %}
+                <td><button type="button" class="btn btn-warning" disabled onclick="" >Publicar</button></td>
+            {% endif %}
             <!-- <td><button type="button" class="btn btn-danger">Eliminar</button></td> -->
             </tr>
         {% endfor %}

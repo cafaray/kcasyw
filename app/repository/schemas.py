@@ -132,3 +132,17 @@ class DrawParticipantGiftCreate(BaseModel):
     participant: ParticipantLink
     gift: GiftLink
     dateselection: date
+
+class DrawPublishBase(BaseModel):
+    startDate: date    
+    endDate: Optional[date]
+    access_code: str
+
+class DrawPublishCreate(DrawPublishBase):
+    pass
+
+class DrawPublish(DrawPublishBase):
+    draw: Draw
+
+class DrawEndPublish(BaseModel):
+    enddate: date
