@@ -1,4 +1,5 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date, Enum, PrimaryKeyConstraint, Table, ForeignKeyConstraint
+import datetime
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date, DateTime, Enum, PrimaryKeyConstraint, Table, ForeignKeyConstraint
 from sqlalchemy.orm import relationship
 
 from .database import Base
@@ -68,3 +69,12 @@ class DrawParticipantGift(Base):
     idgift = Column(Integer, ForeignKey('kmgm12t.id'), primary_key=True)
     dateselection = Column(Date())
     datemail = Column(Date())
+
+class DrawPublish(Base):
+    __tablename__="kmgm99t"
+    iddraw = Column(Integer, ForeignKey('kmgm00t.id'), primary_key=True)
+    startdate = Column(Date())
+    enddate = Column(Date())
+    access_code = Column(String)
+    tmstmp = Column(DateTime, default=datetime.datetime.utcnow)
+    

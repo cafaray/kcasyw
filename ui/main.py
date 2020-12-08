@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash, jsonify
 import requests
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 app = Flask("__main__")
 app.secret_key = "c29ydGUuYmlvdGVjc2EuY29tL2FkbWluCg=="
@@ -148,6 +148,18 @@ def draw_gift_input(iddraw: int):
             return render_template('drawgiftinput.html', draw=draw.json(), gifts=gifts.json())
     else:
         return redirect(url_for('login'))
+
+@app.route('/drawpublish/<iddraw>')
+def set_draw_publish(iddraw: int):
+    draw = getDraw(iddraw).json()
+    if draw['status']=='pending' and draw['fordate']<=datetime.today().strftime('%Y-%m-%d'):
+        access_code = 'bio{}-{}'.format(iddraw, datetime.today().strftime('%M%s'))
+        publish = { "startDate": datetime.today().strftime('%Y-%m-%d'), "access_code": access_code }
+        response = requests.post(BASE_URL+'draws/{}/publish'.format(iddraw), json=publish)
+        return redirect(url_for('home'))
+    else:
+        flash("No es posible publicar el evento, o bien el estatus no es el adecuado o la fecha aún no es adecuada.", "danger")
+        return redirect(url_for('home'))
 
 def getDraw(iddraw:int):
     draw = requests.get(BASE_URL + "draws/{}".format(iddraw))
