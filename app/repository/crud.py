@@ -339,7 +339,7 @@ def get_available_gifts(db:Session, iddraw: int, idgroup: int):
           ON dg.idgift = g.id 
         WHERE dg.idgift NOT IN 
            (SELECT idgift FROM kmgm20t WHERE iddraw = dg.iddraw)
-           AND g.idgroup = {} AND dg.iddraw = {};
+           AND g.idgroup = {} AND dg.iddraw = {} ORDER BY alias;
           """.format(idgroup, iddraw)
     result = db.execute(sql)
     gifts = []
