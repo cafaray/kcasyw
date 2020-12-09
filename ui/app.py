@@ -14,12 +14,12 @@ app.secret_key = "c29ydGUuYmlvdGVjc2EuY29tL2FkbWluCg=="
 app.permanent_session_lifetime= timedelta(hours=1)
 app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 
-# BASE_URL = "http://biotecsa.com/draw/services/"
-BASE_URL = "http://localhost:8000/"
+BASE_URL = "http://biotecsa.com/draw/services/"
+# BASE_URL = "http://localhost:8000/"
 
 if __name__=="__main__":
     log.info('>>>>> Starting server at http://{}/v1/stats/ <<<<<'.format('0.0.0.0:5000'))
-    app.run( host='0.0.0.0', port=5000 )  # debug=True,
+    app.run( host='0.0.0.0', port=5000, debug=True )  # debug=True,
 
 def validateUser(email: str, password: str):
     return email=='sysadmin@biotecsa.com' and password == 'elPaso01+'        
