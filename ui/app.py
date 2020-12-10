@@ -14,8 +14,8 @@ app.secret_key = "c29ydGUuYmlvdGVjc2EuY29tL2FkbWluCg=="
 app.permanent_session_lifetime= timedelta(hours=1)
 app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 
-BASE_URL = "http://biotecsa.com/draw/services/"
-# BASE_URL = "http://localhost:8000/"
+# BASE_URL = "http://biotecsa.com/draw/services/"
+BASE_URL = "http://localhost:8000/"
 
 if __name__=="__main__":
     #log.info('>>>>> Starting server at http://{}/v1/stats/ <<<<<'.format('0.0.0.0:5000'))
@@ -198,6 +198,39 @@ def get_access_code(iddraw: int):
     else:
         return redirect(url_for('login'))
 
+
+@app.route('/drawclose/<iddraw>', methods=['GET','POST'])
+def set_draw_publish_close(iddraw: int):
+    if 'user' in session:
+        if request.method=='POST':
+            print('Request close the draw ...')            
+            response = requests.post(BASE_URL+'draws/{}/unpublish?enddate={}'.format(iddraw, datetime.today().strftime('%Y-%m-%d')))
+            print('results: {}'.format(response.json()))
+            if response.status_code==201:
+                flash("Se ha cerrado el evento.", "success")
+                return redirect(url_for('home'))
+            else:
+                flash("Vaya, algo ha ído mal. No se ha logrado cerrar el evento.", "danger")
+                return redirect(url_for('home'))
+        else:
+            draw = getDraw(iddraw).json()
+            if draw['status']=='onlive' or draw['status']=='closed':
+                print('Request the results ...')
+                response = requests.get(BASE_URL+'events/{}/selections/participants/'.format(iddraw))
+                print('results: {}'.format(response.json()))
+                if response.status_code==200:
+                    if draw['status']=='onlive':
+                        flash("Una vez cerrado el evento, ya no se podrá hacer selección de más regalos.", "warning")
+                    return render_template('drawresume.html', selection=response.json())
+                else:
+                    flash("Vaya, algo ha ído mal y no se han logrado recuperar el resumen: {}".format(response.status_code))
+                    return redirect(url_for('home'))                
+            else:
+                flash("El evento, aún no ha iniciado o ya ha terminado.", "danger")
+                return redirect(url_for('home'))
+    else:
+        return redirect(url_for('login'))
+
 def getDraw(iddraw:int):
     draw = requests.get(BASE_URL + "draws/{}".format(iddraw))
     # print(draw.json())
@@ -356,6 +389,12 @@ def events_selection(alias: str):
                 data = resgift.json()
                 flash("Feliciades has seleccionado tu premio, mira los detalles e imprime esta pantalla como comprobante!", "success")
                 return render_template('/event/selection.html', data= data)
+        elif response.status_code==403:
+            flash("Vaya al parecer el premio no esta más disponible, selecciona otro!", "warning")                
+            return redirect(url_for('events_home'))
+        elif response.status_code==401:
+            flash("Vaya al parecer ya has seleccionado un premio!", "warning")                
+            return redirect(url_for('events_home'))
         else:
             flash("Vaya al parecer no se ha logrado registrar el premio, selecciona otro!", "warning")                
             return redirect(url_for('events_home'))
@@ -407,6 +446,9 @@ def events_login():
             session['data'] = res
             #log.info('VALUES at SESSION:\n\tparticipantid= {}\n\tparticipant={}\n\temail = {}\n\tdraw={}'.format(session['participantid'], session['participant'],session['email'],session['draw']))
             return redirect(url_for('events_home'))
+        elif response.status_code==401:
+            flash("El usuario ya no tiene permiso de acceso!", "danger")
+            return render_template('event/login.html')
         else:
             flash("Usuario o contraseña incorrecto!", "danger")
             return render_template('event/login.html')

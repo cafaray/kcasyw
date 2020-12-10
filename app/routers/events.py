@@ -36,8 +36,13 @@ def get_access_draw(participant: str, access_code: str, db: Session = Depends(ge
     if '@' in participant: # maybe is a email, so I let it in
         access = crud.get_access(db=db, participant=participant, access_code=access_code)
         print('access result:', access)
-        if access:
-            return access
+        if access:            
+            if access['draw']!=None and access['participants']!=None:
+                return access
+            else:
+                error = {"code": "PERMISSION_DENIED", "message": "User can not get access more. Verify the access code {}".format(access_code) }
+                json_compatible_error_data = jsonable_encoder(error)
+                return JSONResponse(status_code=401, content=json_compatible_error_data)            
         else:
             error = {"code": "RESOURCE_NOT_FOUND", "message": "The draw event resource isn't started or doesn't exists. Verify the access code {}".format(access_code) }
             json_compatible_error_data = jsonable_encoder(error)
@@ -65,6 +70,14 @@ def get_available_gits(drawid: int, participantid: int, db: Session = Depends(ge
 def post_draw_participant_gift(drawid: int, alias: str, participantid: int, db: Session = Depends(get_db)):    
     print('Selecting a gift for: ', participantid, alias)
     draw_participant_gift = crud.add_draw_participant_gift(db=db, drawid=drawid, alias=alias, participantid=participantid)
+    if draw_participant_gift<0:
+        error = {"code": "RESOURCE_NOT_AVAILABLE", "message": "The resource is not available." }
+        json_compatible_error_data = jsonable_encoder(error)
+        return JSONResponse(status_code=403, content=json_compatible_error_data)
+    if draw_participant_gift==0:
+        error = {"code": "PERMISSION_DENIED", "message": "You can not get this resource any more." }
+        json_compatible_error_data = jsonable_encoder(error)
+        return JSONResponse(status_code=401, content=json_compatible_error_data)
     return draw_participant_gift
 
 @router.get("/{drawid}/selections/participants/{participantid}", status_code=200)

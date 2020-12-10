@@ -233,19 +233,28 @@ def delete_draw_gift(db: Session, draw_id: int, gift_id: int):
     return -1
 
 def get_draw_participants_gifts(db: Session, draw_id: int, skip: int = 0, limit: int = 100):
-    drawGifts = db.query(models.DrawParticipantGift, models.Gifts)\
+    drawGifts = db.query(models.DrawParticipantGift, models.Gifts, models.Draw, models.Participant)\
+        .filter(models.DrawParticipantGift.iddraw == draw_id)\
         .join(models.Draw, models.Draw.id == models.DrawParticipantGift.iddraw)\
-            .join(models.Gifts, models.Gifts.id == models.DrawParticipantGift.idgift).all()
+        .join(models.Participant, models.Participant.id == models.DrawParticipantGift.idparticipant)\
+        .join(models.Gifts, models.Gifts.id == models.DrawParticipantGift.idgift).all()
     if drawGifts:
         elements = []
         for drawGift in drawGifts:
             oSelected = drawGift[0]
+            print(oSelected)
             oGift = drawGift[1]
-            element = { 'idparticipant': oSelected.idparticipant, 'idgift': oGift.id, 'alias': oSelected.dsgift, 'evidence': oSelected.dateselection, 'gift': oGift.gift, 'description': oGift.description, 'image': oGift.image }            
+            oDraw = drawGift[2]
+            oParticipant = drawGift[3]
+            draw = { 'id': oDraw.id, 'title': oDraw.title, 'fordate': oDraw.fordate, 'status': oDraw.status }
+            gift = { 'id': oGift.id, 'gift': oGift.gift, 'description': oGift.description, 'quantity': oGift.quantity, 'image': oGift.image, 'group': { 'id': oGift.idgroup, 'description': '', 'groupname': '' } }
+            participant = { 'id': oParticipant.id, 'email': oParticipant.email, 'participant': oParticipant.participant, 'group': { 'id': oParticipant.idgroup } }
+            selection = { 'alias': oSelected.dsgift, 'evidence': oSelected.dateselection }
+            element = { 'gift': gift, 'participant': participant, 'selection': selection }
             print('the selected gift is: ', element)
             elements.append(element)
-
-        return { 'data': elements }
+        
+        return { 'draw': draw, 'elements': elements }
     else:
         return None
 
@@ -323,6 +332,13 @@ def get_access(db:Session, participant: str, access_code: str):
     access = db.execute(sql).first() 
     print('access',access)
     if access:
+        # valida que no haya seleccionado un premio 
+        sqlValida = "SELECT count(idparticipant) FROM kmgm20t WHERE iddraw = {} and idparticipant = {};".format(access[0], access[2])
+        valida = db.execute(sqlValida).first()
+        print(valida)
+        if valida:
+            if valida[0] > 0:
+                return  {'draw':None, 'participant':None}
         #  (1, 1, 1, 'Alberto Farias', 'carlos.farias@gft.com', 2, 1, 'Cierre de año 2020', datetime.date(2020, 12, 17), 'onlive', 1, datetime.date(2020, 12, 8), None, '12345', datetime.datetime(2020, 12, 8, 9, 36, 59))
         draw = { 'id': access[0], 'title': access[7], 'status':access[9], 'fordate':access[8] }
         participant = { 'id': access[2], 'participant': access[3], 'email': access[4], 'group' : {'id': access[5], 'groupname': '', 'description': '' } }
@@ -372,13 +388,25 @@ def add_draw_participant_gift(db: Session, drawid: int, participantid: int, alia
     else:
         return None
     if count>0:
-        return count
+        return 0
+    # then validate that the gift still available
+    sql = "SELECT count(idgift) FROM kmgm20t WHERE iddraw='{}' and dsgift = '{}';".format(drawid, alias)
+    result = db.execute(sql)
+    count=1
+    if result:
+        for row in result:
+            print("record found: ", row[0])
+            count = row[0]
+    else:
+        return None
+    if count>0:
+        return -1
     giftid = get_gift_byalias(alias=alias, db=db)
     if giftid:
         db_dg = models.DrawParticipantGift(iddraw = drawid, idparticipant=participantid, idgift = giftid, dsgift=alias)
         print('record to add:', db_dg)
         db.add(db_dg)
         db.commit()
-        return db_dg
+        return 1
     else:
         return None

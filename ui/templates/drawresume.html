@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block usuario %}{{ session['user'] }}{% endblock %}
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+    {% for category, msg in messages %}
+      <div class="alert alert-{{category}}" role="alert">
+        <p>{{msg}}</p>
+      </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+    <div class="form-check form-check-inline">
+        <h2>Resumen del evento  {{ selection.draw['title'] }}</h2>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button type="button" class="btn btn-warning" onclick="javascript:location.replace('/home')">Regresar</button>
+    </div>
+    
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Participante</th>
+            <th scope="col">Regalo</th>
+            <th scope="col">Alias</th>
+            <th scope="col">Evidencia</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for element in selection.elements %}
+            <tr>
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{ element.participant['participant'] }}</td>
+                <td>{{ element.gift['gift'] }}</td>
+                <td>{{ element.selection['alias'] }}</td>
+                <td>{{ element.selection['evidence'] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>  
+{% if selection.draw['status']=='pending' or selection.draw['status']=='onlive' %}
+<p>
+    <div class="form-row align-items-center">        
+        <div class="form-group">
+            <form action="/drawclose/{{selection.draw['id']}}" method="POST">
+                <button type="submit" class="btn btn-danger">Cerrar el evento</button>
+            </form>
+        </div>
+    </div>
+</p>
+{% endif %}
+
+{% endblock %}
