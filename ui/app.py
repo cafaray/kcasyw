@@ -389,6 +389,12 @@ def events_selection(alias: str):
                 data = resgift.json()
                 flash("Feliciades has seleccionado tu premio, mira los detalles e imprime esta pantalla como comprobante!", "success")
                 return render_template('/event/selection.html', data= data)
+        elif response.status_code==403:
+            flash("Vaya al parecer el premio no esta más disponible, selecciona otro!", "warning")                
+            return redirect(url_for('events_home'))
+        elif response.status_code==401:
+            flash("Vaya al parecer ya has seleccionado un premio!", "warning")                
+            return redirect(url_for('events_home'))
         else:
             flash("Vaya al parecer no se ha logrado registrar el premio, selecciona otro!", "warning")                
             return redirect(url_for('events_home'))
@@ -440,6 +446,9 @@ def events_login():
             session['data'] = res
             #log.info('VALUES at SESSION:\n\tparticipantid= {}\n\tparticipant={}\n\temail = {}\n\tdraw={}'.format(session['participantid'], session['participant'],session['email'],session['draw']))
             return redirect(url_for('events_home'))
+        elif response.status_code==401:
+            flash("El usuario ya no tiene permiso de acceso!", "danger")
+            return render_template('event/login.html')
         else:
             flash("Usuario o contraseña incorrecto!", "danger")
             return render_template('event/login.html')
