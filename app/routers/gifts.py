@@ -52,7 +52,7 @@ def remove_gift(giftid: int, db: Session = Depends(get_db)):
 
 @router.put("/{giftid}",  status_code=200)
 def update_gift(giftid: int, gift: schemas.GiftCreate, db: Session = Depends(get_db)):
-    gift = crud.update_gift_image(db=db, gift_id=giftid, gift=gift)
+    gift = crud.update_gift(db=db, gift_id=giftid, gift=gift)
     return gift
 
 @router.post("/{giftid}/uploadfile/")
