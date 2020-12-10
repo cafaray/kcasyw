@@ -1,0 +1,17 @@
+runtime: custom
+env: flex
+entrypoint: gunicorn --preload -b :$PORT main:app
+service: draws-ui-service
+
+runtime_config:
+  python_version: 38
+
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 2
+  cpu_utilization:
+    target_utilization: 0.5
+resources:
+  cpu: 1
+  memory_gb: 0.5
+  disk_size_gb: 10
