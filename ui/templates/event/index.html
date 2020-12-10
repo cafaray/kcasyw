@@ -18,15 +18,24 @@
         <thead class="thead-dark">
         <tr>
             <th scope="col">#</th>
+            <th scope="col">#</th>
+            <th scope="col">#</th>
+            <th scope="col">#</th>
+            <th scope="col">#</th>
+            <th scope="col">#</th>
         </tr>
         </thead>
         <tbody>
-        {% for gift in gifts %}
             <tr>
-                <th scope="row"><a href="/events/selection/{{gift['alias']}}"><img src="/static/images/gift_box.jpeg" height="120" width="120" /><br /><span>#{{ gift['alias'] }}</span></a></th>
-            </tr>
+            {% for gift in gifts %}
+                {% if (loop.index-1) % 6==0 %}
+                </tr>            
+                <tr>
+                {%endif%}
+                <th scope="row"><a href="/events/selection/{{ gift['alias'] }}"><img src="/static/images/gift_box.jpeg" height="120" width="120" /><br /><span> #{{ gift['alias'] }}</span></a></th>
+            
         {% endfor %}
         </tbody>
     </table>  
-
+    
 {% endblock %}
