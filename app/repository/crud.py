@@ -233,19 +233,28 @@ def delete_draw_gift(db: Session, draw_id: int, gift_id: int):
     return -1
 
 def get_draw_participants_gifts(db: Session, draw_id: int, skip: int = 0, limit: int = 100):
-    drawGifts = db.query(models.DrawParticipantGift, models.Gifts)\
+    drawGifts = db.query(models.DrawParticipantGift, models.Gifts, models.Draw, models.Participant)\
+        .filter(models.DrawParticipantGift.iddraw == draw_id)\
         .join(models.Draw, models.Draw.id == models.DrawParticipantGift.iddraw)\
-            .join(models.Gifts, models.Gifts.id == models.DrawParticipantGift.idgift).all()
+        .join(models.Participant, models.Participant.id == models.DrawParticipantGift.idparticipant)\
+        .join(models.Gifts, models.Gifts.id == models.DrawParticipantGift.idgift).all()
     if drawGifts:
         elements = []
         for drawGift in drawGifts:
             oSelected = drawGift[0]
+            print(oSelected)
             oGift = drawGift[1]
-            element = { 'idparticipant': oSelected.idparticipant, 'idgift': oGift.id, 'alias': oSelected.dsgift, 'evidence': oSelected.dateselection, 'gift': oGift.gift, 'description': oGift.description, 'image': oGift.image }            
+            oDraw = drawGift[2]
+            oParticipant = drawGift[3]
+            draw = { 'id': oDraw.id, 'title': oDraw.title, 'fordate': oDraw.fordate, 'status': oDraw.status }
+            gift = { 'id': oGift.id, 'gift': oGift.gift, 'description': oGift.description, 'quantity': oGift.quantity, 'image': oGift.image, 'group': { 'id': oGift.idgroup, 'description': '', 'groupname': '' } }
+            participant = { 'id': oParticipant.id, 'email': oParticipant.email, 'participant': oParticipant.participant, 'group': { 'id': oParticipant.idgroup } }
+            selection = { 'alias': oSelected.dsgift, 'evidence': oSelected.dateselection }
+            element = { 'gift': gift, 'participant': participant, 'selection': selection }
             print('the selected gift is: ', element)
             elements.append(element)
-
-        return { 'data': elements }
+        
+        return { 'draw': draw, 'elements': elements }
     else:
         return None
 

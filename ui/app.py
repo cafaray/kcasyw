@@ -14,8 +14,8 @@ app.secret_key = "c29ydGUuYmlvdGVjc2EuY29tL2FkbWluCg=="
 app.permanent_session_lifetime= timedelta(hours=1)
 app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 
-BASE_URL = "http://biotecsa.com/draw/services/"
-# BASE_URL = "http://localhost:8000/"
+# BASE_URL = "http://biotecsa.com/draw/services/"
+BASE_URL = "http://localhost:8000/"
 
 if __name__=="__main__":
     #log.info('>>>>> Starting server at http://{}/v1/stats/ <<<<<'.format('0.0.0.0:5000'))
@@ -195,6 +195,39 @@ def get_access_code(iddraw: int):
         else:
             flash("No es posible localizar el evento, probablemente aún no este publicado", "warning")
             return redirect(url_for('home'))
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/drawclose/<iddraw>', methods=['GET','POST'])
+def set_draw_publish_close(iddraw: int):
+    if 'user' in session:
+        if request.method=='POST':
+            print('Request close the draw ...')            
+            response = requests.post(BASE_URL+'draws/{}/unpublish?enddate={}'.format(iddraw, datetime.today().strftime('%Y-%m-%d')))
+            print('results: {}'.format(response.json()))
+            if response.status_code==201:
+                flash("Se ha cerrado el evento.", "success")
+                return redirect(url_for('home'))
+            else:
+                flash("Vaya, algo ha ído mal. No se ha logrado cerrar el evento.", "danger")
+                return redirect(url_for('home'))
+        else:
+            draw = getDraw(iddraw).json()
+            if draw['status']=='onlive' or draw['status']=='closed':
+                print('Request the results ...')
+                response = requests.get(BASE_URL+'events/{}/selections/participants/'.format(iddraw))
+                print('results: {}'.format(response.json()))
+                if response.status_code==200:
+                    if draw['status']=='onlive':
+                        flash("Una vez cerrado el evento, ya no se podrá hacer selección de más regalos.", "warning")
+                    return render_template('drawresume.html', selection=response.json())
+                else:
+                    flash("Vaya, algo ha ído mal y no se han logrado recuperar el resumen: {}".format(response.status_code))
+                    return redirect(url_for('home'))                
+            else:
+                flash("El evento, aún no ha iniciado o ya ha terminado.", "danger")
+                return redirect(url_for('home'))
     else:
         return redirect(url_for('login'))
 

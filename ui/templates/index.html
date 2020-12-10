@@ -42,13 +42,17 @@
                 <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawparticipants/{}')".format(draw['id']) }}" >Participantes</button></td>
                 <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawgifts/{}')".format(draw['id']) }}" >Regalos</button></td>
                 <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawpublish/{}')".format(draw['id']) }}" >Publicar</button></td>
+            {% elif draw['status']=='onlive' %}
+                <td></td>
+                <td></td>
+                <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawruning/{}')".format(draw['id']) }}" >Ver acceso</button></td>
+                <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawclose/{}')".format(draw['id']) }}" >Cerrar</button></td>
             {% else %}
                 <td></td>
                 <td></td>
                 <td></td>
-                <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawruning/{}')".format(draw['id']) }}" >Ver acceso</button></td>
+                <td><button type="button" class="btn btn-warning" onclick="{{ "javascript:location.replace('/drawclose/{}')".format(draw['id']) }}" >Resumen</button></td>
             {% endif %}
-            <!-- <td><button type="button" class="btn btn-danger">Eliminar</button></td> -->
             </tr>
         {% endfor %}
         </tbody>
