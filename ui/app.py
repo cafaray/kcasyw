@@ -1,14 +1,14 @@
 import os
-import logging.config
+# import logging.config
 from flask import Flask, redirect, url_for, render_template, request, session, flash, jsonify
 import requests
 from datetime import datetime, timedelta
 
 app = Flask(__name__) # , template_folder='templates', static_folder='static')
-logging_conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__), 'logging.conf'))
-print('===> logging conf path: ', logging_conf_path)
-logging.config.fileConfig(logging_conf_path)
-log = logging.getLogger(__name__)
+# logging_conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__), 'logging.conf'))
+# print('===> logging conf path: ', logging_conf_path)
+# logging.config.fileConfig(logging_conf_path)
+# log = logging.getLogger(__name__)
 
 app.secret_key = "c29ydGUuYmlvdGVjc2EuY29tL2FkbWluCg=="
 app.permanent_session_lifetime= timedelta(hours=1)
@@ -18,8 +18,8 @@ BASE_URL = "http://biotecsa.com/draw/services/"
 # BASE_URL = "http://localhost:8000/"
 
 if __name__=="__main__":
-    log.info('>>>>> Starting server at http://{}/v1/stats/ <<<<<'.format('0.0.0.0:5000'))
-    app.run( host='0.0.0.0', port=5000, debug=True )  # debug=True,
+    #log.info('>>>>> Starting server at http://{}/v1/stats/ <<<<<'.format('0.0.0.0:5000'))
+    app.run( host='0.0.0.0', port=8080, debug=True )  # debug=True, host='0.0.0.0', port=8080
 
 def validateUser(email: str, password: str):
     return email=='sysadmin@biotecsa.com' and password == 'elPaso01+'        
@@ -34,7 +34,7 @@ def login():
         if validateUser(request.form['email'], request.form['password']):
             session.permanent = False
             user = request.form['email']
-            log.info('===> user logged {}'.format(user))
+            #log.info('===> user logged {}'.format(user))
             session['user'] = user
             return redirect(url_for('home'))
         else:
@@ -57,9 +57,9 @@ def logout():
 @app.route('/home')
 def home():
     if 'user' in session:
-        log.info('Application started, getting first service ...')
+        #log.info('Application started, getting first service ...')
         response = requests.get(BASE_URL + "draws/")
-        log.info('response: {}'.format(response))
+        #log.info('response: {}'.format(response))
         if response.status_code==200:
             return render_template('index.html', draws=response.json())
         else: 
@@ -75,7 +75,7 @@ def draw_input():
     if 'user' in session:
         if request.method=='POST':
             draw = {"title": request.form['title'], "fordate": request.form['fordate']}
-            log.info('===> draw to send: {}'.format(draw))
+            #log.info('===> draw to send: {}'.format(draw))
             response = requests.post(BASE_URL + "draws/", json=draw)
             return redirect(url_for("home"))
         else:
@@ -88,13 +88,13 @@ def draw_input_edit(iddraw):
         # print("requested method:",  request.method)
         if request.method=='POST':
             draw = {"title": request.form['title'], "fordate": request.form['fordate']}
-            log.info('===> draw to send: '.format(draw))
+            #log.info('===> draw to send: '.format(draw))
             response = requests.put(BASE_URL + "draws/{}".format(iddraw), json=draw)
-            log.info('===> response: {}'.format(response))
+            #log.info('===> response: {}'.format(response))
             return redirect(url_for("home"))
         else:
             response = requests.get(BASE_URL + "draws/{}".format(iddraw))
-            log.info('===> response: {}'.format(response))
+            #log.info('===> response: {}'.format(response))
             return render_template('drawinput.html', draw=response.json())
     else:
         return redirect(url_for('login'))
@@ -104,8 +104,8 @@ def draw_participants(iddraw: int):
     if 'user' in session:
         response = requests.get(BASE_URL + "draws/{}/participants".format(iddraw))
         draw = requests.get(BASE_URL + "draws/{}".format(iddraw))
-        log.info('===> response.json(): {}'.format(response.json()))
-        log.info('===> draw.json(): {}'.format(draw.json()))
+        #log.info('===> response.json(): {}'.format(response.json()))
+        #log.info('===> draw.json(): {}'.format(draw.json()))
         return render_template('drawparticipants.html', mydraw=draw.json(), drawparticipants=response.json())
     else:
         return redirect(url_for('login'))
@@ -123,9 +123,9 @@ def draw_participants_input(iddraw: int):
                 participant = {'id': e}
                 participants.append(participant)
             draw_participants = {"participants": participants}
-            log.info('===> drawparticipantinput to send: {}'.format(draw_participants))
+            #log.info('===> drawparticipantinput to send: {}'.format(draw_participants))
             response = requests.post(BASE_URL + "draws/{}/participants".format(iddraw), json=draw_participants)
-            log.info('===> response: {}'.format(response))
+            #log.info('===> response: {}'.format(response))
             return redirect(url_for('home'))
         else:
             draw = getDraw(iddraw)
@@ -139,8 +139,8 @@ def draw_gifts(iddraw: int):
     if 'user' in session:
         response = requests.get(BASE_URL + "draws/{}/gifts".format(iddraw))
         draw = requests.get(BASE_URL + "draws/{}".format(iddraw))
-        log.info('===> response.json(): {}'.format(response.json()))
-        log.info('===> draw.json(): {}'.format(draw.json()))
+        #log.info('===> response.json(): {}'.format(response.json()))
+        #log.info('===> draw.json(): {}'.format(draw.json()))
         return render_template('drawgifts.html', mydraw=draw.json(), drawgifts=response.json())
     else:
         return redirect(url_for('login'))
@@ -158,9 +158,9 @@ def draw_gift_input(iddraw: int):
                 gift = {'id': e}
                 gifts.append(gift)
             draw_gifts = {"gifts": gifts}
-            log.info('===> draw_gifts to send: {}'.format(draw_gifts))
+            #log.info('===> draw_gifts to send: {}'.format(draw_gifts))
             response = requests.post(BASE_URL + "draws/{}/gifts".format(iddraw), json=draw_gifts)
-            log.info('===> response: {}'.format(response))
+            #log.info('===> response: {}'.format(response))
             return redirect(url_for('home'))
         else:
             draw = getDraw(iddraw)
@@ -190,7 +190,7 @@ def get_access_code(iddraw: int):
     if 'user' in session:
         response = requests.get(BASE_URL+"draws/{}/publish".format(iddraw))
         if response.status_code==200:
-            log.info('===> get_access_code: {}'.format(response.json()))
+            #log.info('===> get_access_code: {}'.format(response.json()))
             return render_template('drawruning.html', draw=response.json())
         else:
             flash("No es posible localizar el evento, probablemente aún no este publicado", "warning")
@@ -272,13 +272,13 @@ def participant_input_edit(idparticipant):
         # print("requested method:",  request.method, idparticipant)
         if request.method=='POST':
             participant = {"participant": request.form['participant'], "email": request.form['email'], "group": { "id": request.form['idgroup'] } }
-            log.info('===> participant to send: {}'.format(participants))
+            #log.info('===> participant to send: {}'.format(participants))
             response = requests.put(BASE_URL + "participants/{}".format(idparticipant), json=participant)
-            log.info('===> response POST: {}'.format(response))
+            #log.info('===> response POST: {}'.format(response))
             return redirect(url_for("participants"))
         else:
             response = requests.get(BASE_URL + "participants/{}".format(idparticipant))
-            log.info('===> response GET: {}'.format(response))
+            #log.info('===> response GET: {}'.format(response))
             return render_template('participantinput.html', participant=response.json(), groups=getGroups())
 
 # ############################################### #
@@ -299,7 +299,7 @@ def gift_input():
         # print("requested method", request.method)
         if request.method=='POST':
             gift = {"gift": request.form['gift'], "quantity": request.form['quantity'], "description": request.form['description'], "image":'',  "group": { "id": request.form['idgroup'] } }
-            log.info('===> gift to send: {}'.format(gift))
+            #log.info('===> gift to send: {}'.format(gift))
             response = requests.post(BASE_URL + "gifts/", json=gift)
             return redirect(url_for("gifts"))
         else:
@@ -311,14 +311,14 @@ def gift_input_edit(idgift):
     if 'user' in session:
         # print("requested method:",  request.method, idgift)
         if request.method=='POST':
-            gift = {"gift": request.form['gift'], "quantity": request.form['quantity'], "description": request.form['description'], "image":request.form['image'],  "group": { "id": request.form['idgroup'] } }
-            log.info('===> gift to send: {}'.format(gift))
+            gift = {"gift": request.form['gift'], "quantity": request.form['quantity'], "description": request.form['description'], "image":'',  "group": { "id": request.form['idgroup'] } }
+            #log.info('===> gift to send: {}'.format(gift))
             response = requests.put(BASE_URL + "gifts/{}".format(idgift), json=gift)
-            log.info('===> response: {}'.format(response))
+            #log.info('===> response: {}'.format(response))
             return redirect(url_for("gifts"))
         else:
             response = requests.get(BASE_URL + "gifts/{}".format(idgift))
-            log.info('===> response GET: {}'.format(response))
+            #log.info('===> response GET: {}'.format(response))
             return render_template('giftinput.html', gift=response.json(), groups=getGroups())
     else:
         return redirect(url_for('/'))
@@ -327,10 +327,10 @@ def gift_input_edit(idgift):
 def gift_load_image(idgift: int):
     if 'user' in session:        
         file = request.files['file']
-        log.info('===> uploading file: {}'.format(file.filename))
+        #log.info('===> uploading file: {}'.format(file.filename))
         files = {'file': (file.filename, file.read())}
         response = requests.post(BASE_URL+'gifts/{}/uploadfile/'.format(idgift), files=files)
-        log.info('===> response: {}'.format(response))
+        #log.info('===> response: {}'.format(response))
         return redirect(url_for("gifts"))
     else:
         return redirect(url_for('/'))
@@ -347,9 +347,9 @@ def getGroups():
 @app.route('/events/selection/<alias>')
 def events_selection(alias: str):
     if 'participant' in session and 'draw' in session:
-        log.info('Selected gift by user{}: {}'.format(session['participant'], alias))
+        #log.info('Selected gift by user{}: {}'.format(session['participant'], alias))
         response = requests.post(BASE_URL+'events/{}/selections?alias={}&participantid={}'.format(session['draw'], alias, session['participantid']))
-        log.info('response: {}'.format(response))
+        #log.info('response: {}'.format(response))
         if response.status_code==201:
             resgift = requests.get(BASE_URL+'events/{}/selections/participants/{}'.format(session['draw'], session['participantid']))
             if resgift.status_code==200:
@@ -368,10 +368,10 @@ def events_home():
     if 'participant' in session and 'draw' in session:
         # here is the participant, look for available gifts:
         res = requests.get(BASE_URL+'events/{}/selections?participantid={}'.format(session['draw'], session['participantid']))
-        log.info('here is the participant, look for available gifts: {}'.format(res))
+        #log.info('here is the participant, look for available gifts: {}'.format(res))
         if res.status_code==200:            
             data = res.json()
-            log.info('resposne: {}'.format(data))
+            #log.info('resposne: {}'.format(data))
             gifts = data['gifts']
             if len(gifts)<=0:
                 flash("Vaya al parecer no se han localizado premios disponibles!", "warning")                
@@ -405,7 +405,7 @@ def events_login():
             session['email'] = res['participants'][0]['email']
             session['draw'] = res['draw']['id']            
             session['data'] = res
-            log.info('VALUES at SESSION:\n\tparticipantid= {}\n\tparticipant={}\n\temail = {}\n\tdraw={}'.format(session['participantid'], session['participant'],session['email'],session['draw']))
+            #log.info('VALUES at SESSION:\n\tparticipantid= {}\n\tparticipant={}\n\temail = {}\n\tdraw={}'.format(session['participantid'], session['participant'],session['email'],session['draw']))
             return redirect(url_for('events_home'))
         else:
             flash("Usuario o contraseña incorrecto!", "danger")
