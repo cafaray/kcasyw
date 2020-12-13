@@ -148,3 +148,17 @@ SELECT kmgm01t.iddraw AS kmgm01t_iddraw, kmgm01t.idparticipant AS kmgm01t_idpart
     ON kmgm99t.iddraw = kmgm01t.iddraw INNER JOIN kmgm00t 
     ON kmgm00t.id = kmgm01t.iddraw
 WHERE kmgm11t.email = %(email_1)s
+
+
+SELECT dg.iddraw AS iddraw, dg.idgift AS idgift, RIGHT(md5(CONCAT(g.id, g.gift)), 7) alias, g.idgroup As idgroup 
+        FROM kmgm02t dg INNER JOIN kmgm12t g 
+          ON dg.idgift = g.id 
+        WHERE dg.idgift NOT IN 
+           (SELECT idgift FROM kmgm20t WHERE iddraw = dg.iddraw)
+           AND g.idgroup = 1 AND dg.iddraw = 4 ORDER BY alias;
+
+SELECT * FROM kmgm20t WHERE alias IN('46384be','514cdc7','629534c', '6318577')
+
+SELECT id, gift, description FROM kmgm12t INNER JOIN kmgm02t ON kmgm12t.id = kmgm02t.idgift WHERE kmgm12t.id NOT IN (SELECT idgift FROM kmgm20t WHERE iddraw = 4) AND kmgm02t.iddraw=4;
+
+SELECT A.* FROM kmgm11t A INNER JOIN kmgm01t B ON A.id=B.idparticipant WHERE B.iddraw=4 and A.id NOT IN (SELECT idparticipant FROM kmgm20t WHERE iddraw = 4);

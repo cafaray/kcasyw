@@ -260,7 +260,7 @@ def get_draw_participants_gifts(db: Session, draw_id: int, skip: int = 0, limit:
 
 
 def get_draw_participant_gift(db: Session, draw_id: int, participant_id: int):
-    drawGift = db.query(models.DrawParticipantGift, models.Gifts).filter(models.DrawParticipantGift.idparticipant==participant_id)\
+    drawGift = db.query(models.DrawParticipantGift, models.Gifts).filter(models.DrawParticipantGift.idparticipant==participant_id, models.DrawParticipantGift.iddraw ==draw_id)\
         .join(models.Draw, models.Draw.id == models.DrawParticipantGift.iddraw)\
             .join(models.Gifts, models.Gifts.id == models.DrawParticipantGift.idgift).first()
     if drawGift:
@@ -328,7 +328,7 @@ def get_access(db:Session, participant: str, access_code: str):
                   ON kmgm11t.id = kmgm01t.idparticipant INNER JOIN kmgm99t 
                   ON kmgm99t.iddraw = kmgm01t.iddraw INNER JOIN kmgm00t 
                   ON kmgm00t.id = kmgm01t.iddraw
-                WHERE kmgm11t.email = '{}' and kmgm99t.access_code='{}'""".format(participant, access_code)
+                WHERE kmgm00t.status = 'onlive' and kmgm11t.email = '{}' and kmgm99t.access_code='{}'""".format(participant, access_code)
     access = db.execute(sql).first() 
     print('access',access)
     if access:
